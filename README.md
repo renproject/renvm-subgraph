@@ -48,6 +48,14 @@ Some things to note:
 
 ## Deploying to thegraph.com
 
+Authorize, using the AUTH_CODE found in your thegraph.com account:
+
+```sh
+graph auth https://api.thegraph.com/deploy/ <AUTH_CODE>
+```
+
+Then run one of:
+
 ```sh
 yarn deploy:mainnet
 yarn deploy:chaosnet
