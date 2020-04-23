@@ -3,41 +3,93 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: BTCShifter
+    name: BTCGateway
     network: mainnet
     source:
-      address: "0x1258d7FF385d1d81017d4a3d464c02f74C61902a"
-      abi: Contract
-      startBlock: 8875244
+      address: "0xD4d496632b9aF3122FB5DdbF0614aA82effa9F99"
+      abi: Gateway
+      startBlock: 9828381
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.3
+      apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - LogShiftIn
-        - LogShiftOut
-        - OwnershipTransferred
+        - LogMint
+        - LogBurn
+        - Integrator
+        - RenVM
+        - DayData
       abis:
-        - name: Contract
-          file: ./abis/Contract.json
+        - name: Gateway
+          file: ./abis/Gateway.json
       eventHandlers:
-        - event: LogShiftIn(indexed address,uint256,indexed uint256,indexed bytes32)
-          handler: handleLogShiftIn
-        - event: LogShiftOut(bytes,uint256,indexed uint256,indexed bytes)
-          handler: handleLogShiftOut
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-      file: ./src/btc-shifter.ts
+        - event: LogMint(indexed address,uint256,indexed uint256,indexed bytes32)
+          handler: handleLogMint
+        - event: LogBurn(bytes,uint256,indexed uint256,indexed bytes)
+          handler: handleLogBurn
+      file: ./src/btcGateway.ts
+  - kind: ethereum/contract
+    name: ZECGateway
+    network: mainnet
+    source:
+      address: "0x37A4860728E292E5852B215c46DBE7a18862EF93"
+      abi: Gateway
+      startBlock: 9828419
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - LogMint
+        - LogBurn
+        - Integrator
+        - RenVM
+        - DayData
+      abis:
+        - name: Gateway
+          file: ./abis/Gateway.json
+      eventHandlers:
+        - event: LogMint(indexed address,uint256,indexed uint256,indexed bytes32)
+          handler: handleLogMint
+        - event: LogBurn(bytes,uint256,indexed uint256,indexed bytes)
+          handler: handleLogBurn
+      file: ./src/zecGateway.ts
+  - kind: ethereum/contract
+    name: BCHGateway
+    network: mainnet
+    source:
+      address: "0xc3AC15BEc6dA89e8DC5c4d1b4d0C785547676e3a"
+      abi: Gateway
+      startBlock: 9828491
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - LogMint
+        - LogBurn
+        - Integrator
+        - RenVM
+        - DayData
+      abis:
+        - name: Gateway
+          file: ./abis/Gateway.json
+      eventHandlers:
+        - event: LogMint(indexed address,uint256,indexed uint256,indexed bytes32)
+          handler: handleLogMint
+        - event: LogBurn(bytes,uint256,indexed uint256,indexed bytes)
+          handler: handleLogBurn
+      file: ./src/bchGateway.ts
   - kind: ethereum/contract
     name: DarknodeRegistry
     network: mainnet
     source:
-      address: "0xA1eb04Db7a0ffd6e458b1868660a0edAF8199Fa9"
+      address: "0x7C08FF068b7FF6d7d2f431f08B8C2e536ed693DD"
       abi: DarknodeRegistry
-      startBlock: 8075244
+      startBlock: 9828748
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.3
+      apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
         - LogDarknodeRegistered
@@ -53,56 +105,4 @@ dataSources:
           handler: handleLogDarknodeDeregistered
         - event: LogNewEpoch(indexed uint256)
           handler: handleLogNewEpoch
-      file: ./src/darknode-registry.ts
-  - kind: ethereum/contract
-    name: ZECShifter
-    network: mainnet
-    source:
-      address: "0x2b59Ef3Eb28c7388c7eC69d43a9b8E585C461d5b"
-      abi: Contract
-      startBlock: 8075244
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.3
-      language: wasm/assemblyscript
-      entities:
-        - LogShiftIn
-        - LogShiftOut
-        - OwnershipTransferred
-      abis:
-        - name: Contract
-          file: ./abis/Contract.json
-      eventHandlers:
-        - event: LogShiftIn(indexed address,uint256,indexed uint256,indexed bytes32)
-          handler: handleLogShiftIn
-        - event: LogShiftOut(bytes,uint256,indexed uint256,indexed bytes)
-          handler: handleLogShiftOut
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-      file: ./src/zec-shifter.ts
-  - kind: ethereum/contract
-    name: BCHShifter
-    network: mainnet
-    source:
-      address: "0x2b59Ef3Eb28c7388c7eC69d43a9b8E585C461d5b"
-      abi: Contract
-      startBlock: 8075244
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.3
-      language: wasm/assemblyscript
-      entities:
-        - LogShiftIn
-        - LogShiftOut
-        - OwnershipTransferred
-      abis:
-        - name: Contract
-          file: ./abis/Contract.json
-      eventHandlers:
-        - event: LogShiftIn(indexed address,uint256,indexed uint256,indexed bytes32)
-          handler: handleLogShiftIn
-        - event: LogShiftOut(bytes,uint256,indexed uint256,indexed bytes)
-          handler: handleLogShiftOut
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-      file: ./src/bch-shifter.ts
+      file: ./src/darknodeRegistry.ts

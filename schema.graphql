@@ -1,27 +1,113 @@
+enum TransactionType {
+  mint
+  burn
+}
+
 type Transaction @entity {
   id: ID!
-  _createdTimestamp: BigInt
-  _asset: String!
-  _type: String!
-  _amount: BigInt!
-  _feeRate: BigInt!
-  _adapterAddress: Bytes
-  _destination: Bytes
+  createdTimestamp: BigInt
+  asset: String!
+  type: TransactionType!
+  amount: BigInt!
+  feeRate: BigInt!
+  adapterAddress: Bytes
+  destination: Bytes
+  integrator: Bytes
 }
 
 type Darknode @entity {
   id: ID!
-  _operator: Bytes!
-  _isRegistered: Boolean!
-  _registeredTimestamp: BigInt
-  _deregisteredTimestamp: BigInt
-  _startBlock: BigInt
-  _endBlock: BigInt
+  operator: Bytes!
+  isRegistered: Boolean!
+  registeredTimestamp: BigInt
+  deregisteredTimestamp: BigInt
+  startBlock: BigInt
+  endBlock: BigInt
 }
 
 type Epoch @entity {
   id: ID!
-  _createdTimestamp: BigInt
-  _blockNumber: BigInt!
-  _nextEpochBlockNumber: BigInt!
+  createdTimestamp: BigInt
+  blockNumber: BigInt!
+  nextEpochBlockNumber: BigInt!
+}
+
+# Data accumulated and condensed into day stats
+type Integrator @entity {
+    id: ID!
+
+    contractAddress: Bytes!
+
+    totalTxCountBTC: BigInt!
+    totalLockedBTC: BigInt!
+    totalVolumeBTC: BigInt!
+
+    totalTxCountZEC: BigInt!
+    totalLockedZEC: BigInt!
+    totalVolumeZEC: BigInt!
+
+    totalTxCountBCH: BigInt!
+    totalLockedBCH: BigInt!
+    totalVolumeBCH: BigInt!
+}
+
+# Data accumulated and condensed into day stats
+type RenVM @entity {
+    id: ID! # fixed to '1'
+
+    totalTxCountBTC: BigInt!
+    totalLockedBTC: BigInt!
+    totalVolumeBTC: BigInt!
+
+    totalTxCountZEC: BigInt!
+    totalLockedZEC: BigInt!
+    totalVolumeZEC: BigInt!
+
+    totalTxCountBCH: BigInt!
+    totalLockedBCH: BigInt!
+    totalVolumeBCH: BigInt!
+}
+
+enum PeriodType {
+    HOUR
+    DAY
+    WEEK
+    MONTH
+    YEAR
+}
+
+# Data accumulated and condensed into day stats
+type PeriodData @entity {
+    id: ID! # timestamp rounded to current day by dividing by 86400 - should only be one per day
+    date: Int!
+
+    type: PeriodType!
+
+    # total
+
+    totalTxCountBTC: BigInt!
+    totalLockedBTC: BigInt!
+    totalVolumeBTC: BigInt!
+
+    totalTxCountZEC: BigInt!
+    totalLockedZEC: BigInt!
+    totalVolumeZEC: BigInt!
+
+    totalTxCountBCH: BigInt!
+    totalLockedBCH: BigInt!
+    totalVolumeBCH: BigInt!
+
+    # period
+
+    periodTxCountBTC: BigInt!
+    periodLockedBTC: BigInt!
+    periodVolumeBTC: BigInt!
+
+    periodTxCountZEC: BigInt!
+    periodLockedZEC: BigInt!
+    periodVolumeZEC: BigInt!
+
+    periodTxCountBCH: BigInt!
+    periodLockedBCH: BigInt!
+    periodVolumeBCH: BigInt!
 }
