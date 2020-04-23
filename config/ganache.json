@@ -1,0 +1,8 @@
+{
+    "network": "mainnet",
+    "darknodeRegistry": "0xC3Ef4965B788cc4b905084d01F2eb7D4b6E93ABF",
+    "btcGateway": "0x027e4121d4675465E8029F09511D813c3476Ebf5",
+    "zecGateway": "0xFd6e1d4eaDbc80322F62e7148AD223596A005238",
+    "bchGateway": "0x8E225686FdDB86DA290860C764Cf178ba02FDA0B",
+    "startBlock": 1
+}

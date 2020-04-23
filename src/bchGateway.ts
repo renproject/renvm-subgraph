@@ -1,6 +1,6 @@
 // tslint:disable: only-arrow-functions prefer-for-of
 
-import { BigInt } from "@graphprotocol/graph-ts";
+import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 import { Gateway, LogBurn, LogMint } from "../generated/BCHGateway/Gateway";
 import { Transaction } from "../generated/schema";
@@ -14,14 +14,14 @@ export function handleLogMint(event: LogMint): void {
     const tx = new Transaction(txid);
 
     const contract = Gateway.bind(event.address);
-    const to = event.transaction.to;
 
     tx.createdTimestamp = event.block.timestamp;
     tx.asset = "BCH";
     tx.amount = event.params._amount;
     tx.feeRate = BigInt.fromI32(contract.mintFee());
     tx.type = "mint";
-    tx.adapterAddress = to;
+    tx.transactionTo = event.transaction.to;
+    tx.integrator = event.params._to;
     tx.save();
 
     // Nov 2 2018 is 1541116800 for dayStartTimestamp and 17837 for dayID
@@ -35,11 +35,13 @@ export function handleLogMint(event: LogMint): void {
     renVM.totalLockedBCH = renVM.totalLockedBCH.plus(tx.amount);
     renVM.save();
 
-    const integrator = getIntegrator(tx.adapterAddress);
-    integrator.totalTxCountBCH = integrator.totalTxCountBCH.plus(oneBigInt());
-    integrator.totalVolumeBCH = integrator.totalVolumeBCH.plus(tx.amount);
-    integrator.totalLockedBCH = integrator.totalLockedBCH.plus(tx.amount);
-    integrator.save();
+    if (tx.integrator !== null) {
+        const integrator = getIntegrator(tx.integrator as Bytes);
+        integrator.totalTxCountBCH = integrator.totalTxCountBCH.plus(oneBigInt());
+        integrator.totalVolumeBCH = integrator.totalVolumeBCH.plus(tx.amount);
+        integrator.totalLockedBCH = integrator.totalLockedBCH.plus(tx.amount);
+        integrator.save();
+    }
 
     for (let i = 0; i < periods.length; i++) {
         const dayData = getDayData(timestamp, periods[i]);
@@ -69,7 +71,7 @@ export function handleLogBurn(event: LogBurn): void {
     tx.amount = event.params._amount;
     tx.feeRate = BigInt.fromI32(contract.burnFee());
     tx.type = "burn";
-    tx.adapterAddress = to;
+    tx.integrator = to;
     tx.save();
 
     // Nov 2 2018 is 1541116800 for dayStartTimestamp and 17837 for dayID

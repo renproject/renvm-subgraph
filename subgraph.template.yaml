@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: BTCGateway
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0xD4d496632b9aF3122FB5DdbF0614aA82effa9F99"
+      address: "{{btcGateway}}"
       abi: Gateway
-      startBlock: 9828381
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -30,11 +30,11 @@ dataSources:
       file: ./src/btcGateway.ts
   - kind: ethereum/contract
     name: ZECGateway
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0x37A4860728E292E5852B215c46DBE7a18862EF93"
+      address: "{{zecGateway}}"
       abi: Gateway
-      startBlock: 9828419
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -56,11 +56,11 @@ dataSources:
       file: ./src/zecGateway.ts
   - kind: ethereum/contract
     name: BCHGateway
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0xc3AC15BEc6dA89e8DC5c4d1b4d0C785547676e3a"
+      address: "{{bchGateway}}"
       abi: Gateway
-      startBlock: 9828491
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -82,11 +82,11 @@ dataSources:
       file: ./src/bchGateway.ts
   - kind: ethereum/contract
     name: DarknodeRegistry
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0x7C08FF068b7FF6d7d2f431f08B8C2e536ed693DD"
+      address: "{{darknodeRegistry}}"
       abi: DarknodeRegistry
-      startBlock: 9828748
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

@@ -10,9 +10,9 @@ type Transaction @entity {
   type: TransactionType!
   amount: BigInt!
   feeRate: BigInt!
-  adapterAddress: Bytes
-  destination: Bytes
   integrator: Bytes
+  transactionTo: Bytes
+  destination: Bytes
 }
 
 type Darknode @entity {
