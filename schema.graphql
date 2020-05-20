@@ -23,6 +23,8 @@ type Darknode @entity {
   deregisteredTimestamp: BigInt
   startBlock: BigInt
   endBlock: BigInt
+
+  extraInfo: BigInt
 }
 
 type Epoch @entity {
@@ -30,25 +32,16 @@ type Epoch @entity {
   createdTimestamp: BigInt
   blockNumber: BigInt!
   nextEpochBlockNumber: BigInt!
-}
 
-# Data accumulated and condensed into day stats
-type Integrator @entity {
-    id: ID!
+  numberOfDarknodes: BigInt!
+  numberOfDarknodesLastEpoch: BigInt!
+  rewardShareBTC: BigInt!
+  rewardShareZEC: BigInt!
+  rewardShareBCH: BigInt!
 
-    contractAddress: Bytes!
-
-    totalTxCountBTC: BigInt!
-    totalLockedBTC: BigInt!
-    totalVolumeBTC: BigInt!
-
-    totalTxCountZEC: BigInt!
-    totalLockedZEC: BigInt!
-    totalVolumeZEC: BigInt!
-
-    totalTxCountBCH: BigInt!
-    totalLockedBCH: BigInt!
-    totalVolumeBCH: BigInt!
+  totalRewardShareBTC: BigInt!
+  totalRewardShareZEC: BigInt!
+  totalRewardShareBCH: BigInt!
 }
 
 # Data accumulated and condensed into day stats
@@ -68,6 +61,28 @@ type RenVM @entity {
     totalVolumeBCH: BigInt!
 }
 
+# Data accumulated and condensed into day stats
+type Integrator @entity {
+    id: ID!
+    date: Int!
+
+    contractAddress: Bytes!
+
+    txCountBTC: BigInt!
+    lockedBTC: BigInt!
+    volumeBTC: BigInt!
+
+    txCountZEC: BigInt!
+    lockedZEC: BigInt!
+    volumeZEC: BigInt!
+
+    txCountBCH: BigInt!
+    lockedBCH: BigInt!
+    volumeBCH: BigInt!
+
+    integrator24H: Integrator
+}
+
 enum PeriodType {
     HOUR
     DAY
@@ -82,6 +97,8 @@ type PeriodData @entity {
     date: Int!
 
     type: PeriodType!
+    
+    # integrators: [Integrator!]!
 
     # total
 

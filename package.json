@@ -3,7 +3,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "graph build",
-    "prepare": "mustache ./config/${NETWORK:-ganache}.json subgraph.template.yaml > subgraph.yaml",
+    "prepare": "mustache ./config/${NETWORK:-ganache}.json subgraph.template.yaml > subgraph.yaml && mustache ./config/${NETWORK:-ganache}.json src/_config.template.yaml > src/_config.ts",
     "codegen": "npm run prepare && graph codegen --output-dir ./generated",
     "deploy-remote": "npm run codegen && graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ${NAME:-null}",
     "create:local": "graph create --node http://localhost:8020/ noiach/renvm",

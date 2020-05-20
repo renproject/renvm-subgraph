@@ -98,6 +98,10 @@ dataSources:
       abis:
         - name: DarknodeRegistry
           file: ./abis/DarknodeRegistry.json
+        - name: DarknodePayment
+          file: ./abis/DarknodePayment.json
+        - name: Gateway
+          file: ./abis/Gateway.json
       eventHandlers:
         - event: LogDarknodeRegistered(indexed address,indexed address,uint256)
           handler: handleLogDarknodeRegistered
@@ -106,3 +110,23 @@ dataSources:
         - event: LogNewEpoch(indexed uint256)
           handler: handleLogNewEpoch
       file: ./src/darknodeRegistry.ts
+  - kind: ethereum/contract
+    name: DarknodePayment
+    network: {{network}}
+    source:
+      address: "{{darknodePayment}}"
+      abi: DarknodePayment
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - LogDarknodeWithdrew
+      abis:
+        - name: DarknodePayment
+          file: ./abis/DarknodePayment.json
+      eventHandlers:
+        - event: LogDarknodeWithdrew(indexed address,indexed address,indexed address,uint256)
+          handler: handleLogDarknodeWithdrew
+      file: ./src/darknodePayment.ts

@@ -25,15 +25,17 @@ curl \
 GraphQL query:
 
 ```graphql
-{
-  periodDatas(where: { type: DAY }) {
+query get24HourVolume {
+    periodDatas(where: {type: HOUR }, orderBy: date, orderDirection: desc, first: 24) {
     id
+    type
+    date
     totalTxCountBTC
     totalLockedBTC
     totalVolumeBTC
-		periodTxCountBTC
-		periodLockedBTC
-		periodVolumeBTC
+    periodTxCountBTC
+    periodVolumeBTC
+    periodLockedBTC
   }
 }
 ```

@@ -1,6 +1,7 @@
 {
     "network": "kovan",
     "darknodeRegistry": "0x9954C9F839b31E82bc9CA98F234313112D269712",
+    "darknodePayment": "0x023f2e94C3eb128D3bFa6317a3fF860BF93C1616",
     "btcGateway": "0x55363c0dBf97Ff9C0e31dAfe0fC99d3e9ce50b8A",
     "zecGateway": "0xAACbB1e7bA99F2Ed6bd02eC96C2F9a52013Efe2d",
     "bchGateway": "0x9827c8a66a2259fd926E7Fd92EA8DF7ed1D813b1",

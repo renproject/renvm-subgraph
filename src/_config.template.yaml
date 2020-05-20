@@ -1,0 +1,4 @@
+export const network = "{{network}}";
+export const btcGateway = "{{btcGateway}}";
+export const zecGateway = "{{zecGateway}}";
+export const bchGateway = "{{bchGateway}}";

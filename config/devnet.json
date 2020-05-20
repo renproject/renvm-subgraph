@@ -1,8 +1,9 @@
 {
     "network": "kovan",
     "darknodeRegistry": "0x7B69e5e15D4c24c353Fea56f72E4C0c5B93dCb71",
+    "darknodePayment": "0xC7F24fEDfbbAA5248E1F5a160cC30Dcbff9F1176",
     "btcGateway": "0xb4fc6D131A44A3b44668E997Ce0CE00A52D4D9ed",
     "zecGateway": "0x3E31c6E07Eb4C471A6443e90E304E9C68dcdEd7d",
     "bchGateway": "0x86efB11aF3f2c3E3df525a851e3F28E03F4Dcb17",
-    "startBlock": 17529308
+    "startBlock": 17529262
 }

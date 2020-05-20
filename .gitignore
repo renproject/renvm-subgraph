@@ -6,3 +6,5 @@ generated
 
 
 subgraph.yaml
+
+src/_config.json

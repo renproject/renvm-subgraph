@@ -1,8 +1,9 @@
 {
     "network": "mainnet",
-    "darknodeRegistry": "0xC3Ef4965B788cc4b905084d01F2eb7D4b6E93ABF",
-    "btcGateway": "0x027e4121d4675465E8029F09511D813c3476Ebf5",
-    "zecGateway": "0xFd6e1d4eaDbc80322F62e7148AD223596A005238",
-    "bchGateway": "0x8E225686FdDB86DA290860C764Cf178ba02FDA0B",
+    "darknodeRegistry": "0x0290FB167208Af455bB137780163b7B7a9a10C16",
+    "darknodePayment": "0x6eD79Aa1c71FD7BdBC515EfdA3Bd4e26394435cC",
+    "btcGateway": "0x970e8f18ebfEa0B08810f33a5A40438b9530FBCF",
+    "zecGateway": "0x4339316e04CFfB5961D1c41fEF8E44bfA2A7fBd1",
+    "bchGateway": "0xF16165f1046f1B3cDB37dA25E835B986E696313A",
     "startBlock": 1
 }
