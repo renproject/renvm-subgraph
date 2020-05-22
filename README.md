@@ -1,10 +1,8 @@
 # RenVM Subgraph
 
 Currently deployed at
-1. Mainnet: https://thegraph.com/explorer/subgraph/noiach/renvm
-1. Chaosnet: https://thegraph.com/explorer/subgraph/noiach/renvm-chaosnet
-1. Testnet: https://thegraph.com/explorer/subgraph/noiach/renvm-testnet
-1. Devnet: https://thegraph.com/explorer/subgraph/noiach/renvm-devnet
+* Mainnet: https://thegraph.com/explorer/subgraph/renproject/renvm
+* Testnet: https://thegraph.com/explorer/subgraph/renproject/renvm-testnet
 
 ## Examples
 
@@ -17,7 +15,7 @@ curl \
   -X POST \
   -H "Content-Type: application/json" \
   --data '{ "query": "{ transactions { id, amount } }" }' \
-  https://api.thegraph.com/subgraphs/name/noiach/renvm
+  https://api.thegraph.com/subgraphs/name/renproject/renvm
 ```
 
 ### Get daily BTC volume
