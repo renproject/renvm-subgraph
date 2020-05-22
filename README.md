@@ -1,6 +1,6 @@
-# RenVM Subgraph
-
 ![Subgraph](./subgraph.png)
+
+### RenVM Subgraph
 
 Currently deployed at
 * Mainnet: https://thegraph.com/explorer/subgraph/renproject/renvm
