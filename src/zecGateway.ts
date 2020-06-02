@@ -4,7 +4,7 @@ import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 import { Integrator, Transaction } from "../generated/schema";
 import { Gateway, LogBurn, LogMint } from "../generated/ZECGateway/Gateway";
-import { getDayData, getIntegrator, getRenVM, I32, one } from "./common";
+import { getDayData, getIntegrator, getRenVM, I32, one, zero } from "./common";
 
 const periods: string[] = ["HOUR", "DAY", "WEEK", "MONTH", "YEAR"];
 
@@ -74,14 +74,14 @@ export function handleLogBurn(event: LogBurn): void {
     const tx = new Transaction(txid);
 
     const contract = Gateway.bind(event.address);
-    const to = event.transaction.to;
 
     tx.createdTimestamp = event.block.timestamp;
     tx.asset = "ZEC";
     tx.amount = event.params._amount;
     tx.feeRate = BigInt.fromI32(contract.burnFee());
     tx.type = "burn";
-    tx.integrator = to;
+    tx.integrator = event.transaction.from;
+    tx.transactionTo = event.transaction.to;
     tx.save();
 
     // Nov 2 2018 is 1541116800 for dayStartTimestamp and 17837 for dayID
@@ -94,6 +94,26 @@ export function handleLogBurn(event: LogBurn): void {
     renVM.totalVolumeZEC = renVM.totalVolumeZEC.plus(tx.amount);
     renVM.totalLockedZEC = renVM.totalLockedZEC.minus(tx.amount);
     renVM.save();
+
+    // The integrator isn't available from the event, and the `to` address
+    // might be another contract, like a multisig.
+    // If the `to` address has already been marked as an integrator, add the 
+    // values. This will miss a few different cases, so a better solution should
+    // be implemented.
+    const integrator = getIntegrator(tx.integrator as Bytes, 0);
+    if (integrator.txCountBTC.gt(zero()) || integrator.txCountZEC.gt(zero()) || integrator.txCountBCH.gt(zero())) {
+        const integrator24H: Integrator = getIntegrator(tx.integrator as Bytes, timestamp);
+        integrator24H.txCountZEC = integrator24H.txCountZEC.plus(one());
+        integrator24H.volumeZEC = integrator24H.volumeZEC.plus(tx.amount);
+        integrator24H.lockedZEC = integrator24H.lockedZEC.plus(tx.amount);
+        integrator24H.save();
+
+        integrator.txCountZEC = integrator.txCountZEC.plus(one());
+        integrator.volumeZEC = integrator.volumeZEC.plus(tx.amount);
+        integrator.lockedZEC = integrator.lockedZEC.plus(tx.amount);
+        integrator.integrator24H = integrator24H.id;
+        integrator.save();
+    }
 
     for (let i = 0; i < periods.length; i++) {
         const dayData = getDayData(timestamp, periods[i]);

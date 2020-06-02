@@ -7,4 +7,4 @@ generated
 
 subgraph.yaml
 
-src/_config.json
+src/_config.ts

@@ -66,19 +66,19 @@ export function handleLogNewEpoch(event: LogNewEpoch): void {
 
     epoch.numberOfDarknodes = registry.numDarknodes();
     epoch.numberOfDarknodesLastEpoch = registry.numDarknodesPreviousEpoch();
-    epoch.rewardShareBTC = new BigInt(0); // darknodePayment.previousCycleRewardShare(BTCGateway.token());
-    epoch.rewardShareZEC = new BigInt(0); // darknodePayment.previousCycleRewardShare(ZECGateway.token());
-    epoch.rewardShareBCH = new BigInt(0); // darknodePayment.previousCycleRewardShare(BCHGateway.token());
+    epoch.numberOfDarknodesNextEpoch = registry.numDarknodesNextEpoch();
 
-    epoch.totalRewardShareBTC = epoch.rewardShareBTC
-    epoch.totalRewardShareZEC = epoch.rewardShareZEC
-    epoch.totalRewardShareBCH = epoch.rewardShareBCH
+    const btcShare = !BTCGateway.try_minimumBurnAmount().reverted ? darknodePayment.previousCycleRewardShare(BTCGateway.token()) : new BigInt(0);
+    epoch.rewardShareBTC = btcShare;
+    epoch.totalRewardShareBTC = previousEpoch !== null ? epoch.rewardShareBTC.plus(previousEpoch.totalRewardShareBTC) : epoch.rewardShareBTC;
 
-    if (previousEpoch !== null) {
-        epoch.totalRewardShareBTC = epoch.rewardShareBTC.plus(previousEpoch.totalRewardShareBTC);
-        epoch.totalRewardShareZEC = epoch.rewardShareZEC.plus(previousEpoch.totalRewardShareZEC);
-        epoch.totalRewardShareBCH = epoch.rewardShareBCH.plus(previousEpoch.totalRewardShareBCH);
-    }
+    const zecShare = !ZECGateway.try_minimumBurnAmount().reverted ? darknodePayment.previousCycleRewardShare(ZECGateway.token()) : new BigInt(0);
+    epoch.rewardShareZEC = zecShare;
+    epoch.totalRewardShareZEC = previousEpoch !== null ? epoch.rewardShareZEC.plus(previousEpoch.totalRewardShareZEC) : epoch.rewardShareZEC;
+
+    const bchShare = !BCHGateway.try_minimumBurnAmount().reverted ? darknodePayment.previousCycleRewardShare(BCHGateway.token()) : new BigInt(0);
+    epoch.rewardShareBCH = bchShare;
+    epoch.totalRewardShareBCH = previousEpoch !== null ? epoch.rewardShareBCH.plus(previousEpoch.totalRewardShareBCH) : epoch.rewardShareBCH;
 
     epoch.save();
 }

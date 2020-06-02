@@ -42,11 +42,31 @@ query get24HourVolume {
 
 ## Developing locally
 
-Follow the instructions at <https://thegraph.com/docs/quick-start>.
+To setup the graph node, follow the instructions at <https://thegraph.com/docs/quick-start>.
 
 Some things to note:
 1. Pass `-d` to `ganache-cli` so generate contracts with the same addresses as `config/ganache.json`.
 2. If you restart `ganache-cli`, you may have to run `sudo rm -r data/postgres` in the `graph-node/docker` directory.
+
+Once everything is set-up, restarting will look like:
+
+```sh
+# In darknode-sol
+yarn
+yarn ganache-cli -h 0.0.0.0 -d
+yarn truffle migrate
+
+# In graph-node
+cd docker
+sudo rm -rf data/postgres
+./setup.sh # (may have to update docker-compose.yml manually, replace ethereum address with `host.docker.internal` or correct IP)
+docker-compose up
+
+# In renvm-subgraph
+yarn
+yarn create:local
+yarn deploy:local
+```
 
 ## Deploying to thegraph.com
 

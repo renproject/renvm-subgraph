@@ -35,6 +35,7 @@ type Epoch @entity {
 
   numberOfDarknodes: BigInt!
   numberOfDarknodesLastEpoch: BigInt!
+  numberOfDarknodesNextEpoch: BigInt!
   rewardShareBTC: BigInt!
   rewardShareZEC: BigInt!
   rewardShareBCH: BigInt!
