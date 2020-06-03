@@ -54,6 +54,7 @@ Once everything is set-up, restarting will look like:
 # In darknode-sol
 yarn
 yarn ganache-cli -h 0.0.0.0 -d
+# In a different terminal
 yarn truffle migrate
 
 # In graph-node

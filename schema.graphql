@@ -12,6 +12,7 @@ type Transaction @entity {
   feeRate: BigInt!
   integrator: Bytes
   transactionTo: Bytes
+  burnRecipient: Bytes
   destination: Bytes
 }
 

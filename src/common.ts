@@ -1,8 +1,10 @@
 import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 import { Integrator, PeriodData, RenVM } from "../generated/schema";
+import { resolveIntegratorID } from "./integrators";
 
-// @ts-ignore
+// @ts-ignore - typescript doesn't like i32
+
 export type I32 = i32;
 
 export const zero = (): BigInt => {
@@ -34,22 +36,21 @@ export const getPeriodTimespan = (type: string): I32 => {
 };
 
 export const getIntegrator = (contractAddress: Bytes, timestamp: I32): Integrator => {
-    let periodID = "";
+    let periodID: string = "";
     let date: I32 = 0;
     if (timestamp > 0) {
-        const type = "DAY"
-        const periodTimespan = getPeriodTimespan(type);
-        const intPeriodID: I32 = timestamp / periodTimespan;
+        let type: string = "DAY"
+        let periodTimespan: I32 = getPeriodTimespan(type);
+        let intPeriodID: I32 = timestamp / periodTimespan;
         date = intPeriodID * periodTimespan;
         periodID = type + intPeriodID.toString();
     }
 
-    const integratorID = contractAddress.toHex() + periodID;
+    let integratorID: string = resolveIntegratorID(contractAddress) + periodID;
     let integrator: Integrator | null = Integrator.load(integratorID);
 
     if (integrator === null) {
         integrator = new Integrator(integratorID);
-        integrator.contractAddress = contractAddress;
         integrator.txCountBTC = zero();
         integrator.lockedBTC = zero();
         integrator.volumeBTC = zero();
@@ -63,9 +64,12 @@ export const getIntegrator = (contractAddress: Bytes, timestamp: I32): Integrato
         integrator.volumeBCH = zero();
 
         integrator.date = date;
-
-        integrator.save();
     }
+
+    // If there are multiple contracts associated with an integrator, store the
+    // most recent contract.
+    integrator.contractAddress = contractAddress;
+    integrator.save();
 
     // tslint:disable-next-line: no-unnecessary-type-assertion
     return integrator as Integrator;
@@ -97,13 +101,13 @@ export const getRenVM = (): RenVM => {
 };
 
 export const getDayData = (timestamp: I32, type: string): PeriodData => {
-    const periodTimespan = getPeriodTimespan(type);
+    let periodTimespan: I32 = getPeriodTimespan(type);
 
-    const intPeriodID: I32 = timestamp / periodTimespan;
-    const periodStartTimestamp: I32 = intPeriodID * periodTimespan;
-    const periodID: string = type + intPeriodID.toString();
+    let intPeriodID: I32 = timestamp / periodTimespan;
+    let periodStartTimestamp: I32 = intPeriodID * periodTimespan;
+    let periodID: string = type + intPeriodID.toString();
 
-    const renVM = getRenVM();
+    let renVM = getRenVM();
 
     let periodData: PeriodData | null = PeriodData.load(periodID);
     if (periodData == null) {

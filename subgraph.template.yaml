@@ -22,11 +22,11 @@ dataSources:
       abis:
         - name: Gateway
           file: ./abis/Gateway.json
-      eventHandlers:
-        - event: LogMint(indexed address,uint256,indexed uint256,indexed bytes32)
-          handler: handleLogMint
-        - event: LogBurn(bytes,uint256,indexed uint256,indexed bytes)
-          handler: handleLogBurn
+      callHandlers:
+        - function: mint(bytes32,uint256,bytes32,bytes)
+          handler: handleMint
+        - function: burn(bytes,uint256)
+          handler: handleBurn
       file: ./src/btcGateway.ts
   - kind: ethereum/contract
     name: ZECGateway
@@ -48,11 +48,11 @@ dataSources:
       abis:
         - name: Gateway
           file: ./abis/Gateway.json
-      eventHandlers:
-        - event: LogMint(indexed address,uint256,indexed uint256,indexed bytes32)
-          handler: handleLogMint
-        - event: LogBurn(bytes,uint256,indexed uint256,indexed bytes)
-          handler: handleLogBurn
+      callHandlers:
+        - function: mint(bytes32,uint256,bytes32,bytes)
+          handler: handleMint
+        - function: burn(bytes,uint256)
+          handler: handleBurn
       file: ./src/zecGateway.ts
   - kind: ethereum/contract
     name: BCHGateway
@@ -74,11 +74,11 @@ dataSources:
       abis:
         - name: Gateway
           file: ./abis/Gateway.json
-      eventHandlers:
-        - event: LogMint(indexed address,uint256,indexed uint256,indexed bytes32)
-          handler: handleLogMint
-        - event: LogBurn(bytes,uint256,indexed uint256,indexed bytes)
-          handler: handleLogBurn
+      callHandlers:
+        - function: mint(bytes32,uint256,bytes32,bytes)
+          handler: handleMint
+        - function: burn(bytes,uint256)
+          handler: handleBurn
       file: ./src/bchGateway.ts
   - kind: ethereum/contract
     name: DarknodeRegistry
