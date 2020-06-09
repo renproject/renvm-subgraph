@@ -85,3 +85,5 @@ yarn deploy:chaosnet
 yarn deploy:testnet
 yarn deploy:devnet
 ```
+
+Note: only run one deployment at a time, as they all have to generate `./src/_config.ts` with values specific to the network.
