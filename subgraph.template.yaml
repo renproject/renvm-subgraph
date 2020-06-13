@@ -107,6 +107,8 @@ dataSources:
           handler: handleLogDarknodeRegistered
         - event: LogDarknodeDeregistered(indexed address,indexed address)
           handler: handleLogDarknodeDeregistered
+        - event: LogDarknodeRefunded(indexed address,indexed address,uint256)
+          handler: handleLogDarknodeRefunded
         - event: LogNewEpoch(indexed uint256)
           handler: handleLogNewEpoch
       file: ./src/darknodeRegistry.ts
@@ -126,7 +128,12 @@ dataSources:
       abis:
         - name: DarknodePayment
           file: ./abis/DarknodePayment.json
+      callHandlers:
+        - function: changeCycle()
+          handler: handleChangeCycle
       eventHandlers:
+        - event: LogDarknodeClaim(indexed address,uint256)
+          handler: handleLogDarknodeClaim
         - event: LogDarknodeWithdrew(indexed address,indexed address,indexed address,uint256)
           handler: handleLogDarknodeWithdrew
       file: ./src/darknodePayment.ts

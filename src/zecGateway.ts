@@ -14,7 +14,7 @@ export function handleMint(call: MintCall): void {
     let txid = "mint_" + call.inputs._sig.toHexString();
     let tx = new Transaction(txid);
 
-    tx.createdTimestamp = call.block.timestamp;
+    tx.timestamp = call.block.timestamp;
     tx.asset = "ZEC";
     tx.amount = call.inputs._amountUnderlying;
     tx.feeRate = BigInt.fromI32(gateway.mintFee());
@@ -74,7 +74,7 @@ export function handleBurn(call: BurnCall): void {
     let txid = "burn_" + gateway.nextN().toString() + "_" + call.inputs._to.toHexString() + "_" + call.inputs._amount.toString();
     let tx = new Transaction(txid);
 
-    tx.createdTimestamp = call.block.timestamp;
+    tx.timestamp = call.block.timestamp;
     tx.asset = "ZEC";
     tx.amount = call.inputs._amount;
     tx.feeRate = BigInt.fromI32(gateway.burnFee());

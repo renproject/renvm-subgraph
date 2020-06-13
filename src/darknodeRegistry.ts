@@ -5,26 +5,32 @@ import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Gateway } from "../generated/BTCGateway/Gateway";
 import { DarknodePayment } from "../generated/DarknodePayment/DarknodePayment";
 import {
-    DarknodeRegistry, LogDarknodeDeregistered, LogDarknodeRegistered, LogNewEpoch,
+    DarknodeRegistry, LogDarknodeDeregistered, LogDarknodeRefunded, LogDarknodeRegistered,
+    LogNewEpoch,
 } from "../generated/DarknodeRegistry/DarknodeRegistry";
 import { Darknode, Epoch } from "../generated/schema";
 import { bchGateway, btcGateway, zecGateway } from "./_config";
+import { getRenVM, zero } from "./common";
 
 export function handleLogDarknodeRegistered(event: LogDarknodeRegistered): void {
-    let id = event.params._darknodeID.toHexString();
+    let darknodeID = event.params._darknodeID;
     let registry = DarknodeRegistry.bind(event.address);
 
     let epoch = Epoch.load(registry.currentEpoch().value0.toString());
-    let darknode = new Darknode(id);
+    let darknode = new Darknode(darknodeID.toHexString());
     darknode.operator = event.params._darknodeOperator;
-    darknode.isRegistered = true;
-    // if (event.block.timestamp) {
-    darknode.registeredTimestamp = event.block.timestamp;
-    // }
-    if (epoch !== null) {
-        darknode.startBlock = epoch.nextEpochBlockNumber;
-    }
+
+    darknode.bond = event.params._bond;
+
+    darknode.registeredAt = epoch.timestamp.plus(registry.minimumEpochInterval());
+    darknode.deregisteredAt = zero();
+
+    darknode.publicKey = registry.getDarknodePublicKey(darknodeID);
     darknode.save();
+
+    let renVM = getRenVM();
+    renVM.numberOfDarknodesNextEpoch = renVM.numberOfDarknodesNextEpoch.plus(new BigInt(1));
+    renVM.save();
 }
 
 export function handleLogDarknodeDeregistered(event: LogDarknodeDeregistered): void {
@@ -34,13 +40,23 @@ export function handleLogDarknodeDeregistered(event: LogDarknodeDeregistered): v
     let darknode = Darknode.load(id);
     if (darknode !== null) {
         darknode.operator = event.params._darknodeOperator;
-        darknode.isRegistered = false;
-        // if (event.block.timestamp) {
-        darknode.deregisteredTimestamp = event.block.timestamp;
-        // }
-        if (epoch !== null) {
-            darknode.endBlock = epoch.nextEpochBlockNumber;
-        }
+        darknode.deregisteredAt = epoch.timestamp.plus(registry.minimumEpochInterval());
+
+        darknode.save();
+    }
+
+    let renVM = getRenVM();
+    renVM.numberOfDarknodesNextEpoch = renVM.numberOfDarknodesNextEpoch.minus(new BigInt(1));
+    renVM.save();
+}
+
+export function handleLogDarknodeRefunded(event: LogDarknodeRefunded): void {
+    let id = event.params._darknodeID.toHexString();
+    let darknode = Darknode.load(id);
+    if (darknode !== null) {
+        darknode.deregisteredAt = zero();
+        darknode.registeredAt = zero();
+
         darknode.save();
     }
 }
@@ -60,13 +76,27 @@ export function handleLogNewEpoch(event: LogNewEpoch): void {
     let previousEpoch = Epoch.load(previousEpochID);
 
     let epoch = new Epoch(epochID);
-    epoch.createdTimestamp = event.block.timestamp;
+    epoch.timestamp = event.block.timestamp;
+    epoch.epochhash = event.params.epochhash;
     epoch.blockNumber = event.block.number;
     epoch.nextEpochBlockNumber = event.block.number.plus(registry.nextMinimumEpochInterval());
 
     epoch.numberOfDarknodes = registry.numDarknodes();
     epoch.numberOfDarknodesLastEpoch = registry.numDarknodesPreviousEpoch();
-    epoch.numberOfDarknodesNextEpoch = registry.numDarknodesNextEpoch();
+
+    epoch.minimumBond = registry.minimumBond();
+    epoch.minimumEpochInterval = registry.minimumEpochInterval();
+
+    let renVM = getRenVM();
+    renVM.numberOfDarknodes = epoch.numberOfDarknodes;
+    renVM.numberOfDarknodesLastEpoch = epoch.numberOfDarknodesLastEpoch;
+    renVM.numberOfDarknodesNextEpoch = epoch.numberOfDarknodes;
+    renVM.minimumBond = epoch.minimumBond;
+    renVM.minimumEpochInterval = epoch.minimumEpochInterval;
+    renVM.previousEpoch = renVM.currentEpoch;
+    renVM.currentEpoch = epochID;
+    renVM.deregistrationInterval = registry.deregistrationInterval();
+    renVM.save();
 
     let btcShare = !BTCGateway.try_minimumBurnAmount().reverted ? darknodePayment.previousCycleRewardShare(BTCGateway.token()) : new BigInt(0);
     epoch.rewardShareBTC = btcShare;

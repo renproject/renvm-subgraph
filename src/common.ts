@@ -81,6 +81,20 @@ export const getRenVM = (): RenVM => {
 
     if (renVM === null) {
         renVM = new RenVM("1");
+
+        renVM.numberOfDarknodes = zero();
+        renVM.numberOfDarknodesLastEpoch = zero();
+        renVM.numberOfDarknodesNextEpoch = zero();
+
+        renVM.minimumBond = zero();
+        renVM.minimumEpochInterval = zero();
+        renVM.deregistrationInterval = zero();
+
+        renVM.currentCycle = zero();
+        renVM.previousCycle = zero();
+        renVM.currentCyclePayoutPercent = zero();
+        renVM.cycleStartTime = zero();
+
         renVM.totalTxCountBTC = zero();
         renVM.totalLockedBTC = zero();
         renVM.totalVolumeBTC = zero();

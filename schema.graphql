@@ -5,7 +5,7 @@ enum TransactionType {
 
 type Transaction @entity {
   id: ID!
-  createdTimestamp: BigInt
+  timestamp: BigInt
   asset: String!
   type: TransactionType!
   amount: BigInt!
@@ -19,24 +19,26 @@ type Transaction @entity {
 type Darknode @entity {
   id: ID!
   operator: Bytes!
-  isRegistered: Boolean!
-  registeredTimestamp: BigInt
-  deregisteredTimestamp: BigInt
-  startBlock: BigInt
-  endBlock: BigInt
+  bond: BigInt!
+  publicKey: Bytes!
+  registeredAt: BigInt!
+  deregisteredAt: BigInt!
 
-  extraInfo: BigInt
+  lastClaimedEpoch: BigInt
 }
 
 type Epoch @entity {
   id: ID!
-  createdTimestamp: BigInt
+  epochhash: BigInt!
+  timestamp: BigInt!
   blockNumber: BigInt!
   nextEpochBlockNumber: BigInt!
+  
+  minimumBond: BigInt!
+  minimumEpochInterval: BigInt!
 
   numberOfDarknodes: BigInt!
   numberOfDarknodesLastEpoch: BigInt!
-  numberOfDarknodesNextEpoch: BigInt!
   rewardShareBTC: BigInt!
   rewardShareZEC: BigInt!
   rewardShareBCH: BigInt!
@@ -49,6 +51,25 @@ type Epoch @entity {
 # Data accumulated and condensed into day stats
 type RenVM @entity {
     id: ID! # fixed to '1'
+
+    numberOfDarknodes: BigInt!
+    numberOfDarknodesLastEpoch: BigInt!
+    numberOfDarknodesNextEpoch: BigInt!
+
+    minimumBond: BigInt!
+
+    # Epochs
+    minimumEpochInterval: BigInt!
+    currentEpoch: Epoch
+    previousEpoch: Epoch
+    deregistrationInterval: BigInt!
+
+    # Cycles
+    currentCycle: BigInt!
+    previousCycle: BigInt!
+    currentCyclePayoutPercent: BigInt!
+    cycleStartTime: BigInt!
+
 
     totalTxCountBTC: BigInt!
     totalLockedBTC: BigInt!
