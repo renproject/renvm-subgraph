@@ -1,6 +1,6 @@
 import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 
-import { Integrator, PeriodData, RenVM } from "../generated/schema";
+import { Darknode, Integrator, PeriodData, RenVM } from "../generated/schema";
 import { resolveIntegratorID } from "./integrators";
 
 // @ts-ignore - typescript doesn't like i32
@@ -161,4 +161,31 @@ export const getDayData = (timestamp: I32, type: string): PeriodData => {
     // tslint:disable-next-line: no-unnecessary-type-assertion
     return periodData as PeriodData;
 
+};
+
+export const getDarknode = (darknodeID: Bytes): Darknode => {
+
+    let darknode: Darknode | null = Darknode.load(darknodeID.toHexString());
+    if (darknode == null) {
+
+        darknode = new Darknode(darknodeID.toHexString());
+
+        darknode.operator = Bytes.fromI32(0) as Bytes;
+        darknode.bond = zero();
+        darknode.registeredAt = zero();
+        darknode.deregisteredAt = zero();
+        darknode.publicKey = Bytes.fromI32(0) as Bytes;
+
+        darknode.lastClaimedEpoch = zero();
+        darknode.previousLastClaimedEpoch = zero();
+
+        darknode.balanceBTC = zero();
+        darknode.balanceZEC = zero();
+        darknode.balanceBCH = zero();
+
+        darknode.save();
+    }
+
+    // tslint:disable-next-line: no-unnecessary-type-assertion
+    return darknode as Darknode;
 };

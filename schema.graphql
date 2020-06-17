@@ -25,6 +25,11 @@ type Darknode @entity {
   deregisteredAt: BigInt!
 
   lastClaimedEpoch: BigInt
+  previousLastClaimedEpoch: BigInt
+
+  balanceBTC: BigInt!
+  balanceZEC: BigInt!
+  balanceBCH: BigInt!
 }
 
 type Epoch @entity {

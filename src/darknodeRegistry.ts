@@ -8,16 +8,16 @@ import {
     DarknodeRegistry, LogDarknodeDeregistered, LogDarknodeRefunded, LogDarknodeRegistered,
     LogNewEpoch,
 } from "../generated/DarknodeRegistry/DarknodeRegistry";
-import { Darknode, Epoch } from "../generated/schema";
+import { Epoch } from "../generated/schema";
 import { bchGateway, btcGateway, zecGateway } from "./_config";
-import { getRenVM, zero } from "./common";
+import { getDarknode, getRenVM, zero } from "./common";
 
 export function handleLogDarknodeRegistered(event: LogDarknodeRegistered): void {
     let darknodeID = event.params._darknodeID;
     let registry = DarknodeRegistry.bind(event.address);
 
     let epoch = Epoch.load(registry.currentEpoch().value0.toString());
-    let darknode = new Darknode(darknodeID.toHexString());
+    let darknode = getDarknode(darknodeID);
     darknode.operator = event.params._darknodeOperator;
 
     darknode.bond = event.params._bond;
@@ -29,15 +29,14 @@ export function handleLogDarknodeRegistered(event: LogDarknodeRegistered): void 
     darknode.save();
 
     let renVM = getRenVM();
-    renVM.numberOfDarknodesNextEpoch = renVM.numberOfDarknodesNextEpoch.plus(new BigInt(1));
+    renVM.numberOfDarknodesNextEpoch = registry.numDarknodesNextEpoch();
     renVM.save();
 }
 
 export function handleLogDarknodeDeregistered(event: LogDarknodeDeregistered): void {
-    let id = event.params._darknodeID.toHexString();
     let registry = DarknodeRegistry.bind(event.address);
     let epoch = Epoch.load(registry.currentEpoch().value0.toString());
-    let darknode = Darknode.load(id);
+    let darknode = getDarknode(event.params._darknodeID);
     if (darknode !== null) {
         darknode.operator = event.params._darknodeOperator;
         darknode.deregisteredAt = epoch.timestamp.plus(registry.minimumEpochInterval());
@@ -46,13 +45,12 @@ export function handleLogDarknodeDeregistered(event: LogDarknodeDeregistered): v
     }
 
     let renVM = getRenVM();
-    renVM.numberOfDarknodesNextEpoch = renVM.numberOfDarknodesNextEpoch.minus(new BigInt(1));
+    renVM.numberOfDarknodesNextEpoch = registry.numDarknodesNextEpoch();
     renVM.save();
 }
 
 export function handleLogDarknodeRefunded(event: LogDarknodeRefunded): void {
-    let id = event.params._darknodeID.toHexString();
-    let darknode = Darknode.load(id);
+    let darknode = getDarknode(event.params._darknodeID);
     if (darknode !== null) {
         darknode.deregisteredAt = zero();
         darknode.registeredAt = zero();
@@ -90,7 +88,7 @@ export function handleLogNewEpoch(event: LogNewEpoch): void {
     let renVM = getRenVM();
     renVM.numberOfDarknodes = epoch.numberOfDarknodes;
     renVM.numberOfDarknodesLastEpoch = epoch.numberOfDarknodesLastEpoch;
-    renVM.numberOfDarknodesNextEpoch = epoch.numberOfDarknodes;
+    renVM.numberOfDarknodesNextEpoch = registry.numDarknodesNextEpoch();
     renVM.minimumBond = epoch.minimumBond;
     renVM.minimumEpochInterval = epoch.minimumEpochInterval;
     renVM.previousEpoch = renVM.currentEpoch;
