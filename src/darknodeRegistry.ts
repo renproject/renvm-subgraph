@@ -97,17 +97,25 @@ export function handleLogNewEpoch(event: LogNewEpoch): void {
     renVM.previousEpoch = renVM.currentEpoch;
     renVM.currentEpoch = epochID;
     renVM.deregistrationInterval = registry.deregistrationInterval();
+
+    renVM.btcMintFee = !BTCGateway.try_mintFee().reverted ? BTCGateway.mintFee() : zero();
+    renVM.btcBurnFee = !BTCGateway.try_burnFee().reverted ? BTCGateway.burnFee() : zero();
+    renVM.zecMintFee = !ZECGateway.try_mintFee().reverted ? ZECGateway.mintFee() : zero();
+    renVM.zecBurnFee = !ZECGateway.try_burnFee().reverted ? ZECGateway.burnFee() : zero();
+    renVM.bchMintFee = !BCHGateway.try_mintFee().reverted ? BCHGateway.mintFee() : zero();
+    renVM.bchBurnFee = !BCHGateway.try_burnFee().reverted ? BCHGateway.burnFee() : zero();
+
     renVM.save();
 
-    let btcShare = !BTCGateway.try_minimumBurnAmount().reverted ? darknodePayment.previousCycleRewardShare(BTCGateway.token()) : new BigInt(0);
+    let btcShare = !BTCGateway.try_minimumBurnAmount().reverted ? darknodePayment.previousCycleRewardShare(BTCGateway.token()) : zero();
     epoch.rewardShareBTC = btcShare;
     epoch.totalRewardShareBTC = previousEpoch !== null ? epoch.rewardShareBTC.plus(previousEpoch.totalRewardShareBTC) : epoch.rewardShareBTC;
 
-    let zecShare = !ZECGateway.try_minimumBurnAmount().reverted ? darknodePayment.previousCycleRewardShare(ZECGateway.token()) : new BigInt(0);
+    let zecShare = !ZECGateway.try_minimumBurnAmount().reverted ? darknodePayment.previousCycleRewardShare(ZECGateway.token()) : zero();
     epoch.rewardShareZEC = zecShare;
     epoch.totalRewardShareZEC = previousEpoch !== null ? epoch.rewardShareZEC.plus(previousEpoch.totalRewardShareZEC) : epoch.rewardShareZEC;
 
-    let bchShare = !BCHGateway.try_minimumBurnAmount().reverted ? darknodePayment.previousCycleRewardShare(BCHGateway.token()) : new BigInt(0);
+    let bchShare = !BCHGateway.try_minimumBurnAmount().reverted ? darknodePayment.previousCycleRewardShare(BCHGateway.token()) : zero();
     epoch.rewardShareBCH = bchShare;
     epoch.totalRewardShareBCH = previousEpoch !== null ? epoch.rewardShareBCH.plus(previousEpoch.totalRewardShareBCH) : epoch.rewardShareBCH;
 

@@ -3,9 +3,9 @@
 import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 import { Gateway } from "../generated/BTCGateway/Gateway";
-import { Integrator, Transaction } from "../generated/schema";
+import { Transaction } from "../generated/schema";
 import { BurnCall, MintCall } from "../generated/ZECGateway/Gateway";
-import { getIntegrator, getRenVM, I32, one } from "./common";
+import { getIntegrator, getRenVM, one } from "./common";
 
 export function handleMint(call: MintCall): void {
     let gateway = Gateway.bind(call.to);
@@ -22,15 +22,13 @@ export function handleMint(call: MintCall): void {
     tx.integrator = call.from;
     tx.save();
 
-    // Nov 2 2018 is 1541116800 for dayStartTimestamp and 17837 for dayID
-    // Nov 3 2018 would be 1541116800 + 86400 and 17838. And so on, for each exchange
-    let timestamp: I32 = call.block.timestamp.toI32();
-
     // Update Global Values
     let renVM = getRenVM(call.block);
     renVM.totalTxCountBTC = renVM.totalTxCountBTC.plus(one());
     renVM.totalVolumeBTC = renVM.totalVolumeBTC.plus(tx.amount);
     renVM.totalLockedBTC = renVM.totalLockedBTC.plus(tx.amount);
+    renVM.btcMintFee = gateway.mintFee();
+    renVM.btcBurnFee = gateway.burnFee();
     renVM.save();
 
     // Check that the mint hasn't been submitted directly by an account
@@ -61,17 +59,14 @@ export function handleBurn(call: BurnCall): void {
     tx.burnRecipient = call.inputs._to;
     tx.save();
 
-    // Nov 2 2018 is 1541116800 for dayStartTimestamp and 17837 for dayID
-    // Nov 3 2018 would be 1541116800 + 86400 and 17838. And so on, for each exchange
-    let timestamp: I32 = call.block.timestamp.toI32();
-
     // Update Global Values
     let renVM = getRenVM(call.block);
     renVM.totalTxCountBTC = renVM.totalTxCountBTC.plus(one());
     renVM.totalVolumeBTC = renVM.totalVolumeBTC.plus(tx.amount);
     renVM.totalLockedBTC = renVM.totalLockedBTC.minus(tx.amount);
+    renVM.btcMintFee = gateway.mintFee();
+    renVM.btcBurnFee = gateway.burnFee();
     renVM.save();
-
 
     // Check that the burn hasn't been submitted directly by an account
     if (!call.transaction.to.equals(gateway._address)) {

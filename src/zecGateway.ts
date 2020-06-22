@@ -4,7 +4,7 @@ import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 import { Transaction } from "../generated/schema";
 import { BurnCall, Gateway, MintCall } from "../generated/ZECGateway/Gateway";
-import { getIntegrator, getRenVM, I32, one } from "./common";
+import { getIntegrator, getRenVM, one } from "./common";
 
 export function handleMint(call: MintCall): void {
     let gateway = Gateway.bind(call.to);
@@ -21,15 +21,13 @@ export function handleMint(call: MintCall): void {
     tx.integrator = call.from;
     tx.save();
 
-    // Nov 2 2018 is 1541116800 for dayStartTimestamp and 17837 for dayID
-    // Nov 3 2018 would be 1541116800 + 86400 and 17838. And so on, for each exchange
-    let timestamp: I32 = call.block.timestamp.toI32();
-
     // Update Global Values
     let renVM = getRenVM(call.block);
     renVM.totalTxCountZEC = renVM.totalTxCountZEC.plus(one());
     renVM.totalVolumeZEC = renVM.totalVolumeZEC.plus(tx.amount);
     renVM.totalLockedZEC = renVM.totalLockedZEC.plus(tx.amount);
+    renVM.zecMintFee = gateway.mintFee();
+    renVM.zecBurnFee = gateway.burnFee();
     renVM.save();
 
     if (!call.transaction.to.equals(gateway._address)) {
@@ -59,17 +57,14 @@ export function handleBurn(call: BurnCall): void {
     tx.burnRecipient = call.inputs._to;
     tx.save();
 
-    // Nov 2 2018 is 1541116800 for dayStartTimestamp and 17837 for dayID
-    // Nov 3 2018 would be 1541116800 + 86400 and 17838. And so on, for each exchange
-    let timestamp: I32 = call.block.timestamp.toI32();
-
     // Update Global Values
     let renVM = getRenVM(call.block);
     renVM.totalTxCountZEC = renVM.totalTxCountZEC.plus(one());
     renVM.totalVolumeZEC = renVM.totalVolumeZEC.plus(tx.amount);
     renVM.totalLockedZEC = renVM.totalLockedZEC.minus(tx.amount);
+    renVM.zecMintFee = gateway.mintFee();
+    renVM.zecBurnFee = gateway.burnFee();
     renVM.save();
-
 
     // Check that the burn hasn't been submitted directly by an account
     if (!call.transaction.to.equals(gateway._address)) {

@@ -3,8 +3,8 @@
 import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 import { BurnCall, Gateway, MintCall } from "../generated/BCHGateway/Gateway";
-import { Integrator, Transaction } from "../generated/schema";
-import { getIntegrator, getRenVM, I32, one } from "./common";
+import { Transaction } from "../generated/schema";
+import { getIntegrator, getRenVM, one } from "./common";
 
 export function handleMint(call: MintCall): void {
     let gateway = Gateway.bind(call.to);
@@ -26,6 +26,8 @@ export function handleMint(call: MintCall): void {
     renVM.totalTxCountBCH = renVM.totalTxCountBCH.plus(one());
     renVM.totalVolumeBCH = renVM.totalVolumeBCH.plus(tx.amount);
     renVM.totalLockedBCH = renVM.totalLockedBCH.plus(tx.amount);
+    renVM.bchMintFee = gateway.mintFee();
+    renVM.bchBurnFee = gateway.burnFee();
     renVM.save();
 
     if (!call.transaction.to.equals(gateway._address)) {
@@ -55,17 +57,14 @@ export function handleBurn(call: BurnCall): void {
     tx.burnRecipient = call.inputs._to;
     tx.save();
 
-    // Nov 2 2018 is 1541116800 for dayStartTimestamp and 17837 for dayID
-    // Nov 3 2018 would be 1541116800 + 86400 and 17838. And so on, for each exchange
-    let timestamp: I32 = call.block.timestamp.toI32();
-
     // Update Global Values
     let renVM = getRenVM(call.block);
     renVM.totalTxCountBCH = renVM.totalTxCountBCH.plus(one());
     renVM.totalVolumeBCH = renVM.totalVolumeBCH.plus(tx.amount);
     renVM.totalLockedBCH = renVM.totalLockedBCH.minus(tx.amount);
+    renVM.bchMintFee = gateway.mintFee();
+    renVM.bchBurnFee = gateway.burnFee();
     renVM.save();
-
 
     // Check that the burn hasn't been submitted directly by an account
     if (!call.transaction.to.equals(gateway._address)) {
