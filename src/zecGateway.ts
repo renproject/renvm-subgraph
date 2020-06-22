@@ -2,11 +2,9 @@
 
 import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 
-import { Integrator, Transaction } from "../generated/schema";
+import { Transaction } from "../generated/schema";
 import { BurnCall, Gateway, MintCall } from "../generated/ZECGateway/Gateway";
-import { getDayData, getIntegrator, getRenVM, I32, one, zero } from "./common";
-
-const periods: string[] = ["HOUR", "DAY", "WEEK", "MONTH", "YEAR"];
+import { getIntegrator, getRenVM, I32, one } from "./common";
 
 export function handleMint(call: MintCall): void {
     let gateway = Gateway.bind(call.to);
@@ -28,7 +26,7 @@ export function handleMint(call: MintCall): void {
     let timestamp: I32 = call.block.timestamp.toI32();
 
     // Update Global Values
-    let renVM = getRenVM();
+    let renVM = getRenVM(call.block);
     renVM.totalTxCountZEC = renVM.totalTxCountZEC.plus(one());
     renVM.totalVolumeZEC = renVM.totalVolumeZEC.plus(tx.amount);
     renVM.totalLockedZEC = renVM.totalLockedZEC.plus(tx.amount);
@@ -36,35 +34,12 @@ export function handleMint(call: MintCall): void {
 
     if (!call.transaction.to.equals(gateway._address)) {
         if (tx.integrator !== null) {
-
-            let integrator24H: Integrator = getIntegrator(tx.integrator as Bytes, timestamp);
-            integrator24H.txCountZEC = integrator24H.txCountZEC.plus(one());
-            integrator24H.volumeZEC = integrator24H.volumeZEC.plus(tx.amount);
-            integrator24H.lockedZEC = integrator24H.lockedZEC.plus(tx.amount);
-            integrator24H.save();
-
-            let integrator = getIntegrator(tx.integrator as Bytes, 0);
+            let integrator = getIntegrator(tx.integrator as Bytes);
             integrator.txCountZEC = integrator.txCountZEC.plus(one());
             integrator.volumeZEC = integrator.volumeZEC.plus(tx.amount);
             integrator.lockedZEC = integrator.lockedZEC.plus(tx.amount);
-            integrator.integrator24H = integrator24H.id;
             integrator.save();
         }
-    }
-
-    for (let i = 0; i < periods.length; i++) {
-        let dayData = getDayData(timestamp, periods[i]);
-
-        // save info
-        dayData.periodTxCountZEC = dayData.periodTxCountZEC.plus(one());
-        dayData.periodVolumeZEC = dayData.periodVolumeZEC.plus(tx.amount);
-        dayData.periodLockedZEC = dayData.periodLockedZEC.plus(tx.amount);
-
-        dayData.totalTxCountZEC = renVM.totalTxCountZEC;
-        dayData.totalVolumeZEC = renVM.totalVolumeZEC;
-        dayData.totalLockedZEC = renVM.totalLockedZEC;
-
-        dayData.save();
     }
 }
 
@@ -89,7 +64,7 @@ export function handleBurn(call: BurnCall): void {
     let timestamp: I32 = call.block.timestamp.toI32();
 
     // Update Global Values
-    let renVM = getRenVM();
+    let renVM = getRenVM(call.block);
     renVM.totalTxCountZEC = renVM.totalTxCountZEC.plus(one());
     renVM.totalVolumeZEC = renVM.totalVolumeZEC.plus(tx.amount);
     renVM.totalLockedZEC = renVM.totalLockedZEC.minus(tx.amount);
@@ -98,33 +73,10 @@ export function handleBurn(call: BurnCall): void {
 
     // Check that the burn hasn't been submitted directly by an account
     if (!call.transaction.to.equals(gateway._address)) {
-        let integrator = getIntegrator(tx.integrator as Bytes, 0);
-        let integrator24H: Integrator = getIntegrator(tx.integrator as Bytes, timestamp);
-        integrator24H.txCountZEC = integrator24H.txCountZEC.plus(one());
-        integrator24H.volumeZEC = integrator24H.volumeZEC.plus(tx.amount);
-        integrator24H.lockedZEC = integrator24H.lockedZEC.plus(tx.amount);
-        integrator24H.save();
-
+        let integrator = getIntegrator(tx.integrator as Bytes);
         integrator.txCountZEC = integrator.txCountZEC.plus(one());
         integrator.volumeZEC = integrator.volumeZEC.plus(tx.amount);
         integrator.lockedZEC = integrator.lockedZEC.plus(tx.amount);
-        integrator.integrator24H = integrator24H.id;
         integrator.save();
     }
-
-    for (let i = 0; i < periods.length; i++) {
-        let dayData = getDayData(timestamp, periods[i]);
-
-        // save info
-        dayData.periodTxCountZEC = dayData.periodTxCountZEC.plus(one());
-        dayData.periodVolumeZEC = dayData.periodVolumeZEC.plus(tx.amount);
-        dayData.periodLockedZEC = dayData.periodLockedZEC.minus(tx.amount);
-
-        dayData.totalTxCountZEC = renVM.totalTxCountZEC;
-        dayData.totalVolumeZEC = renVM.totalVolumeZEC;
-        dayData.totalLockedZEC = renVM.totalLockedZEC;
-
-        dayData.save();
-    }
-
 }

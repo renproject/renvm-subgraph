@@ -5,9 +5,7 @@ import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { Gateway } from "../generated/BTCGateway/Gateway";
 import { Integrator, Transaction } from "../generated/schema";
 import { BurnCall, MintCall } from "../generated/ZECGateway/Gateway";
-import { getDayData, getIntegrator, getRenVM, I32, one, zero } from "./common";
-
-const periods: string[] = ["HOUR", "DAY", "WEEK", "MONTH", "YEAR"];
+import { getIntegrator, getRenVM, I32, one } from "./common";
 
 export function handleMint(call: MintCall): void {
     let gateway = Gateway.bind(call.to);
@@ -29,7 +27,7 @@ export function handleMint(call: MintCall): void {
     let timestamp: I32 = call.block.timestamp.toI32();
 
     // Update Global Values
-    let renVM = getRenVM();
+    let renVM = getRenVM(call.block);
     renVM.totalTxCountBTC = renVM.totalTxCountBTC.plus(one());
     renVM.totalVolumeBTC = renVM.totalVolumeBTC.plus(tx.amount);
     renVM.totalLockedBTC = renVM.totalLockedBTC.plus(tx.amount);
@@ -38,35 +36,12 @@ export function handleMint(call: MintCall): void {
     // Check that the mint hasn't been submitted directly by an account
     if (!call.transaction.to.equals(gateway._address)) {
         if (tx.integrator !== null) {
-
-            let integrator24H: Integrator = getIntegrator(tx.integrator as Bytes, timestamp);
-            integrator24H.txCountBTC = integrator24H.txCountBTC.plus(one());
-            integrator24H.volumeBTC = integrator24H.volumeBTC.plus(tx.amount);
-            integrator24H.lockedBTC = integrator24H.lockedBTC.plus(tx.amount);
-            integrator24H.save();
-
-            let integrator = getIntegrator(tx.integrator as Bytes, 0);
+            let integrator = getIntegrator(tx.integrator as Bytes);
             integrator.txCountBTC = integrator.txCountBTC.plus(one());
             integrator.volumeBTC = integrator.volumeBTC.plus(tx.amount);
             integrator.lockedBTC = integrator.lockedBTC.plus(tx.amount);
-            integrator.integrator24H = integrator24H.id;
             integrator.save();
         }
-    }
-
-    for (let i = 0; i < periods.length; i++) {
-        let dayData = getDayData(timestamp, periods[i]);
-
-        // save info
-        dayData.periodTxCountBTC = dayData.periodTxCountBTC.plus(one());
-        dayData.periodVolumeBTC = dayData.periodVolumeBTC.plus(tx.amount);
-        dayData.periodLockedBTC = dayData.periodLockedBTC.plus(tx.amount);
-
-        dayData.totalTxCountBTC = renVM.totalTxCountBTC;
-        dayData.totalVolumeBTC = renVM.totalVolumeBTC;
-        dayData.totalLockedBTC = renVM.totalLockedBTC;
-
-        dayData.save();
     }
 }
 
@@ -91,7 +66,7 @@ export function handleBurn(call: BurnCall): void {
     let timestamp: I32 = call.block.timestamp.toI32();
 
     // Update Global Values
-    let renVM = getRenVM();
+    let renVM = getRenVM(call.block);
     renVM.totalTxCountBTC = renVM.totalTxCountBTC.plus(one());
     renVM.totalVolumeBTC = renVM.totalVolumeBTC.plus(tx.amount);
     renVM.totalLockedBTC = renVM.totalLockedBTC.minus(tx.amount);
@@ -100,33 +75,10 @@ export function handleBurn(call: BurnCall): void {
 
     // Check that the burn hasn't been submitted directly by an account
     if (!call.transaction.to.equals(gateway._address)) {
-        let integrator = getIntegrator(tx.integrator as Bytes, 0);
-        let integrator24H: Integrator = getIntegrator(tx.integrator as Bytes, timestamp);
-        integrator24H.txCountBTC = integrator24H.txCountBTC.plus(one());
-        integrator24H.volumeBTC = integrator24H.volumeBTC.plus(tx.amount);
-        integrator24H.lockedBTC = integrator24H.lockedBTC.plus(tx.amount);
-        integrator24H.save();
-
+        let integrator = getIntegrator(tx.integrator as Bytes);
         integrator.txCountBTC = integrator.txCountBTC.plus(one());
         integrator.volumeBTC = integrator.volumeBTC.plus(tx.amount);
         integrator.lockedBTC = integrator.lockedBTC.plus(tx.amount);
-        integrator.integrator24H = integrator24H.id;
         integrator.save();
     }
-
-    for (let i = 0; i < periods.length; i++) {
-        let dayData = getDayData(timestamp, periods[i]);
-
-        // save info
-        dayData.periodTxCountBTC = dayData.periodTxCountBTC.plus(one());
-        dayData.periodVolumeBTC = dayData.periodVolumeBTC.plus(tx.amount);
-        dayData.periodLockedBTC = dayData.periodLockedBTC.minus(tx.amount);
-
-        dayData.totalTxCountBTC = renVM.totalTxCountBTC;
-        dayData.totalVolumeBTC = renVM.totalVolumeBTC;
-        dayData.totalLockedBTC = renVM.totalLockedBTC;
-
-        dayData.save();
-    }
-
 }

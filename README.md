@@ -25,17 +25,11 @@ curl \
 GraphQL query:
 
 ```graphql
-query get24HourVolume {
-    periodDatas(where: {type: HOUR }, orderBy: date, orderDirection: desc, first: 24) {
-    id
-    type
-    date
-    totalTxCountBTC
-    totalLockedBTC
-    totalVolumeBTC
-    periodTxCountBTC
-    periodVolumeBTC
-    periodLockedBTC
+query getRenVMData {
+    renVM(id: "1") {
+      numberOfDarknodes
+      numberOfDarknodesLastEpoch
+      numberOfDarknodesNextEpoch
   }
 }
 ```

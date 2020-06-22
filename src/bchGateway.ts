@@ -4,9 +4,7 @@ import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 import { BurnCall, Gateway, MintCall } from "../generated/BCHGateway/Gateway";
 import { Integrator, Transaction } from "../generated/schema";
-import { getDayData, getIntegrator, getRenVM, I32, one, zero } from "./common";
-
-const periods: string[] = ["HOUR", "DAY", "WEEK", "MONTH", "YEAR"];
+import { getIntegrator, getRenVM, I32, one } from "./common";
 
 export function handleMint(call: MintCall): void {
     let gateway = Gateway.bind(call.to);
@@ -23,12 +21,8 @@ export function handleMint(call: MintCall): void {
     tx.integrator = call.from;
     tx.save();
 
-    // Nov 2 2018 is 1541116800 for dayStartTimestamp and 17837 for dayID
-    // Nov 3 2018 would be 1541116800 + 86400 and 17838. And so on, for each exchange
-    let timestamp: I32 = call.block.timestamp.toI32();
-
     // Update Global Values
-    let renVM = getRenVM();
+    let renVM = getRenVM(call.block);
     renVM.totalTxCountBCH = renVM.totalTxCountBCH.plus(one());
     renVM.totalVolumeBCH = renVM.totalVolumeBCH.plus(tx.amount);
     renVM.totalLockedBCH = renVM.totalLockedBCH.plus(tx.amount);
@@ -36,35 +30,12 @@ export function handleMint(call: MintCall): void {
 
     if (!call.transaction.to.equals(gateway._address)) {
         if (tx.integrator !== null) {
-
-            let integrator24H: Integrator = getIntegrator(tx.integrator as Bytes, timestamp);
-            integrator24H.txCountBCH = integrator24H.txCountBCH.plus(one());
-            integrator24H.volumeBCH = integrator24H.volumeBCH.plus(tx.amount);
-            integrator24H.lockedBCH = integrator24H.lockedBCH.plus(tx.amount);
-            integrator24H.save();
-
-            let integrator = getIntegrator(tx.integrator as Bytes, 0);
+            let integrator = getIntegrator(tx.integrator as Bytes);
             integrator.txCountBCH = integrator.txCountBCH.plus(one());
             integrator.volumeBCH = integrator.volumeBCH.plus(tx.amount);
             integrator.lockedBCH = integrator.lockedBCH.plus(tx.amount);
-            integrator.integrator24H = integrator24H.id;
             integrator.save();
         }
-    }
-
-    for (let i = 0; i < periods.length; i++) {
-        let dayData = getDayData(timestamp, periods[i]);
-
-        // save info
-        dayData.periodTxCountBCH = dayData.periodTxCountBCH.plus(one());
-        dayData.periodVolumeBCH = dayData.periodVolumeBCH.plus(tx.amount);
-        dayData.periodLockedBCH = dayData.periodLockedBCH.plus(tx.amount);
-
-        dayData.totalTxCountBCH = renVM.totalTxCountBCH;
-        dayData.totalVolumeBCH = renVM.totalVolumeBCH;
-        dayData.totalLockedBCH = renVM.totalLockedBCH;
-
-        dayData.save();
     }
 }
 
@@ -89,7 +60,7 @@ export function handleBurn(call: BurnCall): void {
     let timestamp: I32 = call.block.timestamp.toI32();
 
     // Update Global Values
-    let renVM = getRenVM();
+    let renVM = getRenVM(call.block);
     renVM.totalTxCountBCH = renVM.totalTxCountBCH.plus(one());
     renVM.totalVolumeBCH = renVM.totalVolumeBCH.plus(tx.amount);
     renVM.totalLockedBCH = renVM.totalLockedBCH.minus(tx.amount);
@@ -98,33 +69,10 @@ export function handleBurn(call: BurnCall): void {
 
     // Check that the burn hasn't been submitted directly by an account
     if (!call.transaction.to.equals(gateway._address)) {
-        let integrator = getIntegrator(tx.integrator as Bytes, 0);
-        let integrator24H: Integrator = getIntegrator(tx.integrator as Bytes, timestamp);
-        integrator24H.txCountBCH = integrator24H.txCountBCH.plus(one());
-        integrator24H.volumeBCH = integrator24H.volumeBCH.plus(tx.amount);
-        integrator24H.lockedBCH = integrator24H.lockedBCH.plus(tx.amount);
-        integrator24H.save();
-
+        let integrator = getIntegrator(tx.integrator as Bytes);
         integrator.txCountBCH = integrator.txCountBCH.plus(one());
         integrator.volumeBCH = integrator.volumeBCH.plus(tx.amount);
         integrator.lockedBCH = integrator.lockedBCH.plus(tx.amount);
-        integrator.integrator24H = integrator24H.id;
         integrator.save();
     }
-
-    for (let i = 0; i < periods.length; i++) {
-        let dayData = getDayData(timestamp, periods[i]);
-
-        // save info
-        dayData.periodTxCountBCH = dayData.periodTxCountBCH.plus(one());
-        dayData.periodVolumeBCH = dayData.periodVolumeBCH.plus(tx.amount);
-        dayData.periodLockedBCH = dayData.periodLockedBCH.minus(tx.amount);
-
-        dayData.totalTxCountBCH = renVM.totalTxCountBCH;
-        dayData.totalVolumeBCH = renVM.totalVolumeBCH;
-        dayData.totalLockedBCH = renVM.totalLockedBCH;
-
-        dayData.save();
-    }
-
 }

@@ -44,12 +44,15 @@ export function handleWithdraw(call: WithdrawCall): void {
     darknode.balanceBCH = darknodePayment.darknodeBalances(Address.fromHexString(darknodeID.toHexString()) as Address, BCHGateway.token())
 
     darknode.save();
+
+    // Update RenVM's updated block.
+    getRenVM(call.block);
 }
 
 export function handleChangeCycle(call: ChangeCycleCall): void {
     let darknodePayment = DarknodePayment.bind(call.to);
 
-    let renVM = getRenVM();
+    let renVM = getRenVM(call.block);
     renVM.currentCyclePayoutPercent = darknodePayment.currentCyclePayoutPercent();
     renVM.currentCycle = darknodePayment.currentCycle();
     renVM.previousCycle = darknodePayment.previousCycle();

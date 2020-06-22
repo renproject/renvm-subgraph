@@ -55,104 +55,62 @@ type Epoch @entity {
 
 # Data accumulated and condensed into day stats
 type RenVM @entity {
-    id: ID! # fixed to '1'
+  id: ID! # fixed to '1'
 
-    numberOfDarknodes: BigInt!
-    numberOfDarknodesLastEpoch: BigInt!
-    numberOfDarknodesNextEpoch: BigInt!
+  # The most recent Ethereum block in which RenVM had activity.
+  activeBlock: BigInt!
+  activeTimestamp: BigInt!
+  previousActiveBlock: BigInt!
+  previousActiveTimestamp: BigInt!
 
-    minimumBond: BigInt!
+  numberOfDarknodes: BigInt!
+  numberOfDarknodesLastEpoch: BigInt!
+  numberOfDarknodesNextEpoch: BigInt!
 
-    # Epochs
-    minimumEpochInterval: BigInt!
-    currentEpoch: Epoch
-    previousEpoch: Epoch
-    deregistrationInterval: BigInt!
+  minimumBond: BigInt!
 
-    # Cycles
-    currentCycle: BigInt!
-    previousCycle: BigInt!
-    currentCyclePayoutPercent: BigInt!
-    cycleStartTime: BigInt!
+  # Epochs
+  minimumEpochInterval: BigInt!
+  currentEpoch: Epoch
+  previousEpoch: Epoch
+  deregistrationInterval: BigInt!
+
+  # Cycles
+  currentCycle: BigInt!
+  previousCycle: BigInt!
+  currentCyclePayoutPercent: BigInt!
+  cycleStartTime: BigInt!
 
 
-    totalTxCountBTC: BigInt!
-    totalLockedBTC: BigInt!
-    totalVolumeBTC: BigInt!
+  totalTxCountBTC: BigInt!
+  totalLockedBTC: BigInt!
+  totalVolumeBTC: BigInt!
 
-    totalTxCountZEC: BigInt!
-    totalLockedZEC: BigInt!
-    totalVolumeZEC: BigInt!
+  totalTxCountZEC: BigInt!
+  totalLockedZEC: BigInt!
+  totalVolumeZEC: BigInt!
 
-    totalTxCountBCH: BigInt!
-    totalLockedBCH: BigInt!
-    totalVolumeBCH: BigInt!
+  totalTxCountBCH: BigInt!
+  totalLockedBCH: BigInt!
+  totalVolumeBCH: BigInt!
 }
 
 # Data accumulated and condensed into day stats
 type Integrator @entity {
-    id: ID!
-    date: Int!
+  id: ID!
+  date: Int!
 
-    contractAddress: Bytes!
+  contractAddress: Bytes!
 
-    txCountBTC: BigInt!
-    lockedBTC: BigInt!
-    volumeBTC: BigInt!
+  txCountBTC: BigInt!
+  lockedBTC: BigInt!
+  volumeBTC: BigInt!
 
-    txCountZEC: BigInt!
-    lockedZEC: BigInt!
-    volumeZEC: BigInt!
+  txCountZEC: BigInt!
+  lockedZEC: BigInt!
+  volumeZEC: BigInt!
 
-    txCountBCH: BigInt!
-    lockedBCH: BigInt!
-    volumeBCH: BigInt!
-
-    integrator24H: Integrator
-}
-
-enum PeriodType {
-    HOUR
-    DAY
-    WEEK
-    MONTH
-    YEAR
-}
-
-# Data accumulated and condensed into day stats
-type PeriodData @entity {
-    id: ID! # timestamp rounded to current day by dividing by 86400 - should only be one per day
-    date: Int!
-
-    type: PeriodType!
-    
-    # integrators: [Integrator!]!
-
-    # total
-
-    totalTxCountBTC: BigInt!
-    totalLockedBTC: BigInt!
-    totalVolumeBTC: BigInt!
-
-    totalTxCountZEC: BigInt!
-    totalLockedZEC: BigInt!
-    totalVolumeZEC: BigInt!
-
-    totalTxCountBCH: BigInt!
-    totalLockedBCH: BigInt!
-    totalVolumeBCH: BigInt!
-
-    # period
-
-    periodTxCountBTC: BigInt!
-    periodLockedBTC: BigInt!
-    periodVolumeBTC: BigInt!
-
-    periodTxCountZEC: BigInt!
-    periodLockedZEC: BigInt!
-    periodVolumeZEC: BigInt!
-
-    periodTxCountBCH: BigInt!
-    periodLockedBCH: BigInt!
-    periodVolumeBCH: BigInt!
+  txCountBCH: BigInt!
+  lockedBCH: BigInt!
+  volumeBCH: BigInt!
 }

@@ -28,7 +28,7 @@ export function handleLogDarknodeRegistered(event: LogDarknodeRegistered): void 
     darknode.publicKey = registry.getDarknodePublicKey(darknodeID);
     darknode.save();
 
-    let renVM = getRenVM();
+    let renVM = getRenVM(event.block);
     renVM.numberOfDarknodesNextEpoch = registry.numDarknodesNextEpoch();
     renVM.save();
 }
@@ -44,7 +44,7 @@ export function handleLogDarknodeDeregistered(event: LogDarknodeDeregistered): v
         darknode.save();
     }
 
-    let renVM = getRenVM();
+    let renVM = getRenVM(event.block);
     renVM.numberOfDarknodesNextEpoch = registry.numDarknodesNextEpoch();
     renVM.save();
 }
@@ -57,6 +57,9 @@ export function handleLogDarknodeRefunded(event: LogDarknodeRefunded): void {
 
         darknode.save();
     }
+
+    // Update RenVM's latest active block.
+    getRenVM(event.block);
 }
 
 export function handleLogNewEpoch(event: LogNewEpoch): void {
@@ -85,7 +88,7 @@ export function handleLogNewEpoch(event: LogNewEpoch): void {
     epoch.minimumBond = registry.minimumBond();
     epoch.minimumEpochInterval = registry.minimumEpochInterval();
 
-    let renVM = getRenVM();
+    let renVM = getRenVM(event.block);
     renVM.numberOfDarknodes = epoch.numberOfDarknodes;
     renVM.numberOfDarknodesLastEpoch = epoch.numberOfDarknodesLastEpoch;
     renVM.numberOfDarknodesNextEpoch = registry.numDarknodesNextEpoch();
