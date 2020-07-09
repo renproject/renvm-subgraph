@@ -98,12 +98,12 @@ export function handleLogNewEpoch(event: LogNewEpoch): void {
     renVM.currentEpoch = epochID;
     renVM.deregistrationInterval = registry.deregistrationInterval();
 
-    renVM.btcMintFee = !BTCGateway.try_mintFee().reverted ? BTCGateway.mintFee() : zero();
-    renVM.btcBurnFee = !BTCGateway.try_burnFee().reverted ? BTCGateway.burnFee() : zero();
-    renVM.zecMintFee = !ZECGateway.try_mintFee().reverted ? ZECGateway.mintFee() : zero();
-    renVM.zecBurnFee = !ZECGateway.try_burnFee().reverted ? ZECGateway.burnFee() : zero();
-    renVM.bchMintFee = !BCHGateway.try_mintFee().reverted ? BCHGateway.mintFee() : zero();
-    renVM.bchBurnFee = !BCHGateway.try_burnFee().reverted ? BCHGateway.burnFee() : zero();
+    renVM.btcMintFee = !BTCGateway.try_mintFee().reverted ? BTCGateway.mintFee() : 0;
+    renVM.btcBurnFee = !BTCGateway.try_burnFee().reverted ? BTCGateway.burnFee() : 0;
+    renVM.zecMintFee = !ZECGateway.try_mintFee().reverted ? ZECGateway.mintFee() : 0;
+    renVM.zecBurnFee = !ZECGateway.try_burnFee().reverted ? ZECGateway.burnFee() : 0;
+    renVM.bchMintFee = !BCHGateway.try_mintFee().reverted ? BCHGateway.mintFee() : 0;
+    renVM.bchBurnFee = !BCHGateway.try_burnFee().reverted ? BCHGateway.burnFee() : 0;
 
     renVM.save();
 

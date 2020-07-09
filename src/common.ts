@@ -67,12 +67,12 @@ export const getRenVM = (updateAtBlock: ethereum.Block): RenVM => {
         renVM.minimumEpochInterval = zero();
         renVM.deregistrationInterval = zero();
 
-        renVM.btcMintFee = zero();
-        renVM.btcBurnFee = zero();
-        renVM.zecMintFee = zero();
-        renVM.zecBurnFee = zero();
-        renVM.bchMintFee = zero();
-        renVM.bchBurnFee = zero();
+        renVM.btcMintFee = 0;
+        renVM.btcBurnFee = 0;
+        renVM.zecMintFee = 0;
+        renVM.zecBurnFee = 0;
+        renVM.bchMintFee = 0;
+        renVM.bchBurnFee = 0;
 
         renVM.currentCycle = zero();
         renVM.previousCycle = zero();

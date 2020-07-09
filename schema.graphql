@@ -76,12 +76,12 @@ type RenVM @entity {
   deregistrationInterval: BigInt!
 
   # Fees
-  btcMintFee: BigInt!
-  btcBurnFee: BigInt!
-  zecMintFee: BigInt!
-  zecBurnFee: BigInt!
-  bchMintFee: BigInt!
-  bchBurnFee: BigInt!
+  btcMintFee: Int!
+  btcBurnFee: Int!
+  zecMintFee: Int!
+  zecBurnFee: Int!
+  bchMintFee: Int!
+  bchBurnFee: Int!
 
   # Cycles
   currentCycle: BigInt!
