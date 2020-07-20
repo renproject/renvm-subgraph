@@ -4,7 +4,7 @@ import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 import { BurnCall, Gateway, MintCall } from "../generated/BCHGateway/Gateway";
 import { Transaction } from "../generated/schema";
-import { getIntegrator, getRenVM, one } from "./common";
+import { getIntegrator, getIntegratorContract, getRenVM, one } from "./common";
 
 export function handleMint(call: MintCall): void {
     let gateway = Gateway.bind(call.to);
@@ -37,6 +37,12 @@ export function handleMint(call: MintCall): void {
             integrator.volumeBCH = integrator.volumeBCH.plus(tx.amount);
             integrator.lockedBCH = integrator.lockedBCH.plus(tx.amount);
             integrator.save();
+
+            let integratorContract = getIntegratorContract(tx.integrator as Bytes);
+            integratorContract.txCountBCH = integratorContract.txCountBCH.plus(one());
+            integratorContract.volumeBCH = integratorContract.volumeBCH.plus(tx.amount);
+            integratorContract.lockedBCH = integratorContract.lockedBCH.plus(tx.amount);
+            integratorContract.save();
         }
     }
 }
@@ -73,5 +79,11 @@ export function handleBurn(call: BurnCall): void {
         integrator.volumeBCH = integrator.volumeBCH.plus(tx.amount);
         integrator.lockedBCH = integrator.lockedBCH.plus(tx.amount);
         integrator.save();
+
+        let integratorContract = getIntegratorContract(tx.integrator as Bytes);
+        integratorContract.txCountBCH = integratorContract.txCountBCH.plus(one());
+        integratorContract.volumeBCH = integratorContract.volumeBCH.plus(tx.amount);
+        integratorContract.lockedBCH = integratorContract.lockedBCH.plus(tx.amount);
+        integratorContract.save();
     }
 }

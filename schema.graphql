@@ -122,3 +122,22 @@ type Integrator @entity {
   lockedBCH: BigInt!
   volumeBCH: BigInt!
 }
+
+type IntegratorContract @entity {
+  id: ID!
+  date: Int!
+
+  contractAddress: Bytes!
+
+  txCountBTC: BigInt!
+  lockedBTC: BigInt!
+  volumeBTC: BigInt!
+
+  txCountZEC: BigInt!
+  lockedZEC: BigInt!
+  volumeZEC: BigInt!
+
+  txCountBCH: BigInt!
+  lockedBCH: BigInt!
+  volumeBCH: BigInt!
+}

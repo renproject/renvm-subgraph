@@ -5,7 +5,7 @@ import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { Gateway } from "../generated/BTCGateway/Gateway";
 import { Transaction } from "../generated/schema";
 import { BurnCall, MintCall } from "../generated/ZECGateway/Gateway";
-import { getIntegrator, getRenVM, one } from "./common";
+import { getIntegrator, getIntegratorContract, getRenVM, one } from "./common";
 
 export function handleMint(call: MintCall): void {
     let gateway = Gateway.bind(call.to);
@@ -39,6 +39,12 @@ export function handleMint(call: MintCall): void {
             integrator.volumeBTC = integrator.volumeBTC.plus(tx.amount);
             integrator.lockedBTC = integrator.lockedBTC.plus(tx.amount);
             integrator.save();
+
+            let integratorContract = getIntegratorContract(tx.integrator as Bytes);
+            integratorContract.txCountBTC = integratorContract.txCountBTC.plus(one());
+            integratorContract.volumeBTC = integratorContract.volumeBTC.plus(tx.amount);
+            integratorContract.lockedBTC = integratorContract.lockedBTC.plus(tx.amount);
+            integratorContract.save();
         }
     }
 }
@@ -75,5 +81,11 @@ export function handleBurn(call: BurnCall): void {
         integrator.volumeBTC = integrator.volumeBTC.plus(tx.amount);
         integrator.lockedBTC = integrator.lockedBTC.plus(tx.amount);
         integrator.save();
+
+        let integratorContract = getIntegratorContract(tx.integrator as Bytes);
+        integratorContract.txCountBTC = integratorContract.txCountBTC.plus(one());
+        integratorContract.volumeBTC = integratorContract.volumeBTC.plus(tx.amount);
+        integratorContract.lockedBTC = integratorContract.lockedBTC.plus(tx.amount);
+        integratorContract.save();
     }
 }

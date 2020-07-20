@@ -4,7 +4,7 @@ import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 import { Transaction } from "../generated/schema";
 import { BurnCall, Gateway, MintCall } from "../generated/ZECGateway/Gateway";
-import { getIntegrator, getRenVM, one } from "./common";
+import { getIntegrator, getIntegratorContract, getRenVM, one } from "./common";
 
 export function handleMint(call: MintCall): void {
     let gateway = Gateway.bind(call.to);
@@ -37,6 +37,12 @@ export function handleMint(call: MintCall): void {
             integrator.volumeZEC = integrator.volumeZEC.plus(tx.amount);
             integrator.lockedZEC = integrator.lockedZEC.plus(tx.amount);
             integrator.save();
+
+            let integratorContract = getIntegratorContract(tx.integrator as Bytes);
+            integratorContract.txCountZEC = integratorContract.txCountZEC.plus(one());
+            integratorContract.volumeZEC = integratorContract.volumeZEC.plus(tx.amount);
+            integratorContract.lockedZEC = integratorContract.lockedZEC.plus(tx.amount);
+            integratorContract.save();
         }
     }
 }
@@ -73,5 +79,11 @@ export function handleBurn(call: BurnCall): void {
         integrator.volumeZEC = integrator.volumeZEC.plus(tx.amount);
         integrator.lockedZEC = integrator.lockedZEC.plus(tx.amount);
         integrator.save();
+
+        let integratorContract = getIntegratorContract(tx.integrator as Bytes);
+        integratorContract.txCountZEC = integratorContract.txCountZEC.plus(one());
+        integratorContract.volumeZEC = integratorContract.volumeZEC.plus(tx.amount);
+        integratorContract.lockedZEC = integratorContract.lockedZEC.plus(tx.amount);
+        integratorContract.save();
     }
 }

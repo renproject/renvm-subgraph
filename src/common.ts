@@ -1,6 +1,6 @@
 import { BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 
-import { Darknode, Integrator, RenVM } from "../generated/schema";
+import { Darknode, Integrator, IntegratorContract, RenVM } from "../generated/schema";
 import { resolveIntegratorID } from "./integrators";
 
 // @ts-ignore - typescript doesn't like i32
@@ -45,6 +45,38 @@ export const getIntegrator = (contractAddress: Bytes): Integrator => {
 
     // tslint:disable-next-line: no-unnecessary-type-assertion
     return integrator as Integrator;
+};
+
+export const getIntegratorContract = (contractAddress: Bytes): IntegratorContract => {
+    let date: I32 = 0;
+
+    let integratorContractID: string = contractAddress.toHexString();
+    let integratorContract: IntegratorContract | null = IntegratorContract.load(integratorContractID);
+
+    if (integratorContract === null) {
+        integratorContract = new IntegratorContract(integratorContractID);
+        integratorContract.txCountBTC = zero();
+        integratorContract.lockedBTC = zero();
+        integratorContract.volumeBTC = zero();
+
+        integratorContract.txCountZEC = zero();
+        integratorContract.lockedZEC = zero();
+        integratorContract.volumeZEC = zero();
+
+        integratorContract.txCountBCH = zero();
+        integratorContract.lockedBCH = zero();
+        integratorContract.volumeBCH = zero();
+
+        integratorContract.date = date;
+    }
+
+    // If there are multiple contracts associated with an integratorContract, store the
+    // most recent contract.
+    integratorContract.contractAddress = contractAddress;
+    integratorContract.save();
+
+    // tslint:disable-next-line: no-unnecessary-type-assertion
+    return integratorContract as IntegratorContract;
 };
 
 export const getRenVM = (updateAtBlock: ethereum.Block): RenVM => {

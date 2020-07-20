@@ -22,5 +22,5 @@ export const resolveIntegratorID = (address: Bytes): string => {
     if (addressHex == "0x3973b2acdfac17171315e49ef19a0758b8b6f104") return "curve";
     if (addressHex == "0x8fb1a3e0eb443a91f28728b8799f5f0eb8a51f96") return "curve";
 
-    return address.toHexString();
+    return addressHex;
 }
