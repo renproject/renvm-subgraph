@@ -26,9 +26,9 @@ export const resolveIntegratorID = (address: Bytes): string => {
         return "curve";
     if (addressHex == "0xaeade605d01fe9a8e9c4b3aa0130a90d62167029")
         return "curve";
-    if (addressHex == "0x7a9575b7985dd34fc4a2095bd1456290c8c89c32")
-        return "curve";
     if (addressHex == "0x73ab2bd10ad10f7174a1ad5afae3ce3d991c5047")
+        return "curve";
+    if (addressHex == "0x7a9575b7985dd34fc4a2095bd1456290c8c89c32")
         return "curve";
 
     if (addressHex == "0x1160c98bfeec42a329aebbf27e4ed4d43007ce99")
