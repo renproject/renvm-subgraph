@@ -6,7 +6,11 @@
     "darknodePayment": "0x023f2e94C3eb128D3bFa6317a3fF860BF93C1616",
 
     "gatewayRegistry": "0x557e211EC5fc9a6737d2C6b7a1aDe3e0C11A8D5D",
+    "uniswapFactory": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
+    "weth": "0xd0A1E359811322d97991E03f863a0C30C2cF029C",
+    "usd": "0x5a719Cf3E02c17c876F6d294aDb5CB7C6eB47e2F",
 
+    "_comment": "DEPRECATED",
     "btcGateway": "0x55363c0dBf97Ff9C0e31dAfe0fC99d3e9ce50b8A",
     "zecGateway": "0xAACbB1e7bA99F2Ed6bd02eC96C2F9a52013Efe2d",
     "bchGateway": "0x9827c8a66a2259fd926E7Fd92EA8DF7ed1D813b1",

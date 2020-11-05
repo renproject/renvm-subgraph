@@ -9,15 +9,14 @@ import {
 } from "../generated/GatewayRegistry/Gateway";
 import { RenERC20 } from "../generated/GatewayRegistry/RenERC20";
 import { Transaction } from "../generated/schema";
+import { addAmount, subAmount } from "./utils/assetAmount";
 import {
-    addValue,
     getIntegrator,
     getIntegratorContract,
     getRenVM,
     one,
-    setValue,
-    subValue,
-} from "./common";
+} from "./utils/common";
+import { addValue, setValue } from "./utils/valueWithAsset";
 
 export function handleMint(call: MintCall): void {
     let gateway = Gateway.bind(call.to);
@@ -39,21 +38,21 @@ export function handleMint(call: MintCall): void {
     // Update Global Values
     let renVM = getRenVM(call.block);
     renVM.txCount = addValue(renVM.txCount, renVM.id, "txCount", symbol, one());
-    renVM.locked = addValue(
+    renVM.locked = addAmount(
         renVM.locked,
         renVM.id,
         "locked",
         symbol,
         tx.amount
     );
-    renVM.volume = addValue(
+    renVM.volume = addAmount(
         renVM.volume,
         renVM.id,
         "volume",
         symbol,
         tx.amount
     );
-    renVM.fees = addValue(
+    renVM.fees = addAmount(
         renVM.fees,
         renVM.id,
         "fees",
@@ -88,21 +87,21 @@ export function handleMint(call: MintCall): void {
                 symbol,
                 one()
             );
-            integrator.locked = addValue(
+            integrator.locked = addAmount(
                 integrator.locked,
                 integrator.id,
                 "locked",
                 symbol,
                 tx.amount
             );
-            integrator.volume = addValue(
+            integrator.volume = addAmount(
                 integrator.volume,
                 integrator.id,
                 "volume",
                 symbol,
                 tx.amount
             );
-            integrator.fees = addValue(
+            integrator.fees = addAmount(
                 integrator.fees,
                 integrator.id,
                 "fees",
@@ -123,21 +122,21 @@ export function handleMint(call: MintCall): void {
                 symbol,
                 one()
             );
-            integratorContract.locked = addValue(
+            integratorContract.locked = addAmount(
                 integratorContract.locked,
                 integratorContract.id,
                 "locked",
                 symbol,
                 tx.amount
             );
-            integratorContract.volume = addValue(
+            integratorContract.volume = addAmount(
                 integratorContract.volume,
                 integratorContract.id,
                 "volume",
                 symbol,
                 tx.amount
             );
-            integratorContract.fees = addValue(
+            integratorContract.fees = addAmount(
                 integratorContract.fees,
                 integratorContract.id,
                 "fees",
@@ -178,7 +177,7 @@ export function handleBurn(call: BurnCall): void {
     // Update Global Values
     let renVM = getRenVM(call.block);
     renVM.txCount = addValue(renVM.txCount, renVM.id, "txCount", symbol, one());
-    renVM.locked = subValue(
+    renVM.locked = subAmount(
         renVM.locked,
         renVM.id,
         "locked",
@@ -189,14 +188,14 @@ export function handleBurn(call: BurnCall): void {
                 .div(BigInt.fromI32(10000))
         )
     );
-    renVM.volume = addValue(
+    renVM.volume = addAmount(
         renVM.volume,
         renVM.id,
         "volume",
         symbol,
         tx.amount
     );
-    renVM.fees = addValue(
+    renVM.fees = addAmount(
         renVM.fees,
         renVM.id,
         "fees",
@@ -231,7 +230,7 @@ export function handleBurn(call: BurnCall): void {
             symbol,
             one()
         );
-        integrator.locked = subValue(
+        integrator.locked = subAmount(
             integrator.locked,
             integrator.id,
             "locked",
@@ -242,14 +241,14 @@ export function handleBurn(call: BurnCall): void {
                     .div(BigInt.fromI32(10000))
             )
         );
-        integrator.volume = addValue(
+        integrator.volume = addAmount(
             integrator.volume,
             integrator.id,
             "volume",
             symbol,
             tx.amount
         );
-        integrator.fees = addValue(
+        integrator.fees = addAmount(
             integrator.fees,
             integrator.id,
             "fees",
@@ -268,7 +267,7 @@ export function handleBurn(call: BurnCall): void {
             symbol,
             one()
         );
-        integratorContract.locked = subValue(
+        integratorContract.locked = subAmount(
             integratorContract.locked,
             integratorContract.id,
             "locked",
@@ -279,14 +278,14 @@ export function handleBurn(call: BurnCall): void {
                     .div(BigInt.fromI32(10000))
             )
         );
-        integratorContract.volume = addValue(
+        integratorContract.volume = addAmount(
             integratorContract.volume,
             integratorContract.id,
             "volume",
             symbol,
             tx.amount
         );
-        integratorContract.fees = addValue(
+        integratorContract.fees = addAmount(
             integratorContract.fees,
             integratorContract.id,
             "fees",

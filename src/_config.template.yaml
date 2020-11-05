@@ -1,4 +1,9 @@
 export const network = "{{network}}";
+export const uniswapFactoryAddress = "{{uniswapFactory}}";
+export const wethAddress = "{{weth}}";
+export const usdAddress = "{{usd}}";
+
+// Deprecated
 export const btcGateway = "{{btcGateway}}";
 export const zecGateway = "{{zecGateway}}";
 export const bchGateway = "{{bchGateway}}";

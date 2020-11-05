@@ -12,7 +12,8 @@ import { DarknodeRegistry } from "../generated/DarknodeRegistry/DarknodeRegistry
 import { RenERC20 } from "../generated/GatewayRegistry/RenERC20";
 import { Epoch } from "../generated/schema";
 import { bch, bchGateway, btc, btcGateway, zec, zecGateway } from "./_config";
-import { getDarknode, getRenVM, one, setValue, zero } from "./common";
+import { setAmount } from "./utils/assetAmount";
+import { getDarknode, getRenVM, one, zero } from "./utils/common";
 
 export function handleLogDarknodeWithdrew(event: LogDarknodeWithdrew): void {}
 
@@ -27,15 +28,15 @@ export function handleLogDarknodeClaim(event: LogDarknodeClaim): void {
     darknode.lastClaimedEpoch = event.params._cycle;
 
     darknode.balanceBTC = darknodePayment.darknodeBalances(
-        Address.fromHexString(darknodeID.toHexString()) as Address,
+        Address.fromString(darknodeID.toHexString()),
         BTCGateway.token()
     );
     darknode.balanceZEC = darknodePayment.darknodeBalances(
-        Address.fromHexString(darknodeID.toHexString()) as Address,
+        Address.fromString(darknodeID.toHexString()),
         ZECGateway.token()
     );
     darknode.balanceBCH = darknodePayment.darknodeBalances(
-        Address.fromHexString(darknodeID.toHexString()) as Address,
+        Address.fromString(darknodeID.toHexString()),
         BCHGateway.token()
     );
 
@@ -51,10 +52,10 @@ export function handleLogDarknodeClaim(event: LogDarknodeClaim): void {
                 break;
             }
             let balance = darknodePayment.darknodeBalances(
-                Address.fromHexString(darknodeID.toHexString()) as Address,
+                Address.fromString(darknodeID.toHexString()),
                 token._address
             );
-            darknode.balances = setValue(
+            darknode.balances = setAmount(
                 darknode.balances,
                 darknode.id,
                 "balances",
@@ -97,10 +98,10 @@ export function handleWithdraw(call: WithdrawCall): void {
     let token = RenERC20.bind(call.inputs._token);
     let symbol = token.symbol();
     let balance = darknodePayment.darknodeBalances(
-        Address.fromHexString(darknodeID.toHexString()) as Address,
+        Address.fromString(darknodeID.toHexString()),
         token._address
     );
-    darknode.balances = setValue(
+    darknode.balances = setAmount(
         darknode.balances,
         darknode.id,
         "balances",

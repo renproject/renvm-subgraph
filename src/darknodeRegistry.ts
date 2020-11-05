@@ -14,7 +14,8 @@ import {
 import { RenERC20 } from "../generated/GatewayRegistry/RenERC20";
 import { Epoch } from "../generated/schema";
 import { bchGateway, btcGateway, zecGateway } from "./_config";
-import { getDarknode, getRenVM, one, setValue, zero } from "./common";
+import { setAmount } from "./utils/assetAmount";
+import { getDarknode, getRenVM, one, zero } from "./utils/common";
 
 export function handleLogDarknodeRegistered(
     event: LogDarknodeRegistered
@@ -163,7 +164,7 @@ export function handleLogNewEpoch(event: LogNewEpoch): void {
             let rewardShare = tryRewardShare.reverted
                 ? zero()
                 : tryRewardShare.value;
-            epoch.rewardShares = setValue(
+            epoch.rewardShares = setAmount(
                 epoch.rewardShares,
                 epoch.id,
                 "rewardShares",
@@ -176,7 +177,7 @@ export function handleLogNewEpoch(event: LogNewEpoch): void {
                           previousEpoch.totalRewardShareBTC
                       )
                     : epoch.rewardShareBTC;
-            epoch.cumulativeRewardShares = setValue(
+            epoch.cumulativeRewardShares = setAmount(
                 epoch.cumulativeRewardShares,
                 epoch.id,
                 "cumulativeRewardShares",

@@ -1,14 +1,12 @@
-import { BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 
 import {
-    Asset,
-    AssetValue,
     Darknode,
     Integrator,
     IntegratorContract,
     RenVM,
-} from "../generated/schema";
-import { resolveIntegratorID } from "./integrators";
+} from "../../generated/schema";
+import { resolveIntegratorID } from "../integrators";
 
 // @ts-ignore - typescript doesn't like i32
 
@@ -16,6 +14,10 @@ export type I32 = i32;
 
 export const zero = (): BigInt => {
     return BigInt.fromI32(0);
+};
+
+export const zeroDot = (): BigDecimal => {
+    return BigInt.fromI32(0).toBigDecimal();
 };
 
 export const one = (): BigInt => {
@@ -188,75 +190,4 @@ export const getDarknode = (darknodeID: Bytes): Darknode => {
 
     // tslint:disable-next-line: no-unnecessary-type-assertion
     return darknode as Darknode;
-};
-
-const updateValue = (
-    array: string[],
-    itemID: string,
-    field: string,
-    symbol: string,
-    value: BigInt,
-    set: boolean,
-    add: boolean,
-    subtract: boolean
-): string[] => {
-    let id = itemID + "_" + field + "_" + symbol;
-
-    let asset = Asset.load(symbol);
-    let assetSymbol: string | null = asset === null ? null : asset.symbol;
-
-    let assetValue = AssetValue.load(id);
-    if (assetValue == null) {
-        assetValue = new AssetValue(id);
-        assetValue.symbol = symbol;
-        assetValue.asset = assetSymbol;
-        assetValue.value = zero();
-    }
-
-    assetValue.value = set
-        ? value
-        : add
-        ? assetValue.value.plus(value)
-        : subtract
-        ? assetValue.value.minus(value)
-        : assetValue.value;
-    assetValue.save();
-
-    for (let i = 0; i < array.length; i++) {
-        if (array[i] == id) {
-            return array;
-        }
-    }
-    array.push(id);
-    return array;
-};
-
-export const setValue = (
-    array: string[],
-    itemID: string,
-    field: string,
-    asset: string,
-    value: BigInt
-): string[] => {
-    return updateValue(array, itemID, field, asset, value, true, false, false);
-};
-
-export const addValue = (
-    array: string[],
-    itemID: string,
-    field: string,
-    asset: string,
-    value: BigInt
-): string[] => {
-    return updateValue(array, itemID, field, asset, value, false, true, false);
-};
-
-export const subValue = (
-    array: string[],
-    itemID: string,
-    field: string,
-    asset: string,
-    value: BigInt
-): string[] => {
-    return updateValue(array, itemID, field, asset, value, false, false, true);
 };

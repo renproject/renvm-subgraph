@@ -125,6 +125,10 @@ dataSources:
                 file: ./abis/Gateway.json
               - name: RenERC20
                 file: ./abis/RenERC20LogicV1.json
+              - name: UniswapFactory
+                file: ./abis/UniswapFactory.json
+              - name: UniswapExchange
+                file: ./abis/UniswapExchange.json
           eventHandlers:
               - event: LogDarknodeRegistered(indexed address,indexed address,uint256)
                 handler: handleLogDarknodeRegistered
@@ -184,6 +188,10 @@ templates:
                 file: ./abis/Gateway.json
               - name: RenERC20
                 file: ./abis/RenERC20LogicV1.json
+              - name: UniswapFactory
+                file: ./abis/UniswapFactory.json
+              - name: UniswapExchange
+                file: ./abis/UniswapExchange.json
           callHandlers:
               - function: mint(bytes32,uint256,bytes32,bytes)
                 handler: handleMint

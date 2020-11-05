@@ -23,11 +23,20 @@ type Asset @entity {
     symbol: String!
 }
 
-type AssetValue @entity {
+type ValueWithAsset @entity {
     id: ID!
     symbol: String!
     asset: Asset
     value: BigInt!
+}
+
+type AssetAmount @entity {
+    id: ID!
+    symbol: String!
+    asset: Asset
+    amount: BigInt!
+    amountInEth: BigDecimal!
+    amountInUsd: BigDecimal!
 }
 
 type Darknode @entity {
@@ -41,7 +50,7 @@ type Darknode @entity {
     lastClaimedEpoch: BigInt
     previousLastClaimedEpoch: BigInt
 
-    balances: [AssetValue!]!
+    balances: [AssetAmount!]!
 
     # DEPRECATED
 
@@ -63,8 +72,8 @@ type Epoch @entity {
     numberOfDarknodes: BigInt!
     numberOfDarknodesLastEpoch: BigInt!
 
-    rewardShares: [AssetValue!]!
-    cumulativeRewardShares: [AssetValue!]!
+    rewardShares: [AssetAmount!]!
+    cumulativeRewardShares: [AssetAmount!]!
 
     # DEPRECATED
 
@@ -106,8 +115,8 @@ type RenVM @entity {
     bchMintFee: Int!
     bchBurnFee: Int!
 
-    mintFee: [AssetValue!]!
-    burnFee: [AssetValue!]!
+    mintFee: [ValueWithAsset!]!
+    burnFee: [ValueWithAsset!]!
 
     # Cycles
     currentCycle: BigInt!
@@ -115,10 +124,10 @@ type RenVM @entity {
     currentCyclePayoutPercent: BigInt!
     cycleStartTime: BigInt!
 
-    txCount: [AssetValue!]!
-    locked: [AssetValue!]!
-    volume: [AssetValue!]!
-    fees: [AssetValue!]!
+    txCount: [ValueWithAsset!]!
+    locked: [AssetAmount!]!
+    volume: [AssetAmount!]!
+    fees: [AssetAmount!]!
 
     # DEPRECATED
 
@@ -142,10 +151,10 @@ type Integrator @entity {
 
     contractAddress: Bytes!
 
-    txCount: [AssetValue!]!
-    locked: [AssetValue!]!
-    volume: [AssetValue!]!
-    fees: [AssetValue!]!
+    txCount: [ValueWithAsset!]!
+    locked: [AssetAmount!]!
+    volume: [AssetAmount!]!
+    fees: [AssetAmount!]!
 
     # DEPRECATED
 
@@ -168,10 +177,10 @@ type IntegratorContract @entity {
 
     contractAddress: Bytes!
 
-    txCount: [AssetValue!]!
-    locked: [AssetValue!]!
-    volume: [AssetValue!]!
-    fees: [AssetValue!]!
+    txCount: [ValueWithAsset!]!
+    locked: [AssetAmount!]!
+    volume: [AssetAmount!]!
+    fees: [AssetAmount!]!
 
     # DEPRECATED
 

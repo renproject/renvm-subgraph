@@ -7,7 +7,9 @@ import { LogGatewayRegistered } from "../generated/GatewayRegistry/GatewayRegist
 import { RenERC20 } from "../generated/GatewayRegistry/RenERC20";
 import { Asset } from "../generated/schema";
 import { Gateway as GatewayTemplate } from "../generated/templates";
-import { getRenVM, setValue, zero } from "./common";
+import { setAmount } from "./utils/assetAmount";
+import { getRenVM, zero } from "./utils/common";
+import { setValue } from "./utils/valueWithAsset";
 
 export function handleLogGatewayRegistered(event: LogGatewayRegistered): void {
     let gatewayAddress = event.params._gatewayContract;
@@ -31,21 +33,21 @@ export function handleLogGatewayRegistered(event: LogGatewayRegistered): void {
             symbol,
             zero()
         );
-        renVM.locked = setValue(
+        renVM.locked = setAmount(
             renVM.locked,
             renVM.id,
             "locked",
             symbol,
             zero()
         );
-        renVM.volume = setValue(
+        renVM.volume = setAmount(
             renVM.volume,
             renVM.id,
             "volume",
             symbol,
             zero()
         );
-        renVM.fees = setValue(renVM.fees, renVM.id, "fees", symbol, zero());
+        renVM.fees = setAmount(renVM.fees, renVM.id, "fees", symbol, zero());
         renVM.mintFee = setValue(
             renVM.mintFee,
             renVM.id,
