@@ -24,11 +24,11 @@ export const resolveIntegratorID = (address: Bytes): string => {
         return "curve";
     if (addressHex == "0x26d9980571e77ffb0349f9c801dd7ca9951fb656")
         return "curve";
-    if (addressHex == "0xaeade605d01fe9a8e9c4b3aa0130a90d62167029")
-        return "curve";
     if (addressHex == "0x7a9575b7985dd34fc4a2095bd1456290c8c89c32")
         return "curve";
     if (addressHex == "0x73ab2bd10ad10f7174a1ad5afae3ce3d991c5047")
+        return "curve";
+    if (addressHex == "0xaeade605d01fe9a8e9c4b3aa0130a90d62167029")
         return "curve";
 
     if (addressHex == "0x1160c98bfeec42a329aebbf27e4ed4d43007ce99")
@@ -39,14 +39,16 @@ export const resolveIntegratorID = (address: Bytes): string => {
         return "RenEscrow";
     if (addressHex == "0x493d490d84053fed122035d8889d88a9c492f7fa")
         return "RenEscrow";
+    if (addressHex == "0x8fe7e17d20af82258e3ad798ef781add8c060dbf")
+        return "RenEscrow";
     if (addressHex == "0x15632dcfba89c33f9bc0ffed0380b1319be57223")
         return "RenEscrow";
 
     // Testnet
 
-    if (addressHex == "0x3973b2acdfac17171315e49ef19a0758b8b6f104")
-        return "curve";
     if (addressHex == "0x8fb1a3e0eb443a91f28728b8799f5f0eb8a51f96")
+        return "curve";
+    if (addressHex == "0x3973b2acdfac17171315e49ef19a0758b8b6f104")
         return "curve";
 
     return addressHex;

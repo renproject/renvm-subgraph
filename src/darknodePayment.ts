@@ -1,4 +1,4 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 
 import { Gateway } from "../generated/BTCGateway/Gateway";
 import {
@@ -8,27 +8,62 @@ import {
     LogDarknodeWithdrew,
     WithdrawCall,
 } from "../generated/DarknodePayment/DarknodePayment";
-import { bchGateway, btcGateway, zecGateway } from "./_config";
-import { getDarknode, getRenVM } from "./common";
+import { DarknodeRegistry } from "../generated/DarknodeRegistry/DarknodeRegistry";
+import { RenERC20 } from "../generated/GatewayRegistry/RenERC20";
+import { Epoch } from "../generated/schema";
+import { bch, bchGateway, btc, btcGateway, zec, zecGateway } from "./_config";
+import { getDarknode, getRenVM, one, setValue, zero } from "./common";
 
-export function handleLogDarknodeWithdrew(event: LogDarknodeWithdrew): void {
-}
+export function handleLogDarknodeWithdrew(event: LogDarknodeWithdrew): void {}
 
 export function handleLogDarknodeClaim(event: LogDarknodeClaim): void {
     let BTCGateway = Gateway.bind(Address.fromString(btcGateway.slice(2)));
     let ZECGateway = Gateway.bind(Address.fromString(zecGateway.slice(2)));
     let BCHGateway = Gateway.bind(Address.fromString(bchGateway.slice(2)));
-
     let darknodePayment = DarknodePayment.bind(event.address);
-
     let darknodeID = event.params._darknode;
     let darknode = getDarknode(darknodeID);
     darknode.previousLastClaimedEpoch = darknode.lastClaimedEpoch;
     darknode.lastClaimedEpoch = event.params._cycle;
 
-    darknode.balanceBTC = darknodePayment.darknodeBalances(Address.fromHexString(darknodeID.toHexString()) as Address, BTCGateway.token())
-    darknode.balanceZEC = darknodePayment.darknodeBalances(Address.fromHexString(darknodeID.toHexString()) as Address, ZECGateway.token())
-    darknode.balanceBCH = darknodePayment.darknodeBalances(Address.fromHexString(darknodeID.toHexString()) as Address, BCHGateway.token())
+    darknode.balanceBTC = darknodePayment.darknodeBalances(
+        Address.fromHexString(darknodeID.toHexString()) as Address,
+        BTCGateway.token()
+    );
+    darknode.balanceZEC = darknodePayment.darknodeBalances(
+        Address.fromHexString(darknodeID.toHexString()) as Address,
+        ZECGateway.token()
+    );
+    darknode.balanceBCH = darknodePayment.darknodeBalances(
+        Address.fromHexString(darknodeID.toHexString()) as Address,
+        BCHGateway.token()
+    );
+
+    let i = zero();
+    while (true) {
+        let tokens = darknodePayment.try_registeredTokens(i);
+        if (tokens.reverted || tokens.value.equals(Address.fromI32(0))) {
+            break;
+        } else {
+            let token = RenERC20.bind(tokens.value);
+            let symbol = token.try_symbol();
+            if (symbol.reverted) {
+                break;
+            }
+            let balance = darknodePayment.darknodeBalances(
+                Address.fromHexString(darknodeID.toHexString()) as Address,
+                token._address
+            );
+            darknode.balances = setValue(
+                darknode.balances,
+                darknode.id,
+                "balances",
+                symbol.value,
+                balance
+            );
+        }
+        i = i.plus(one());
+    }
 
     darknode.save();
 }
@@ -36,25 +71,42 @@ export function handleLogDarknodeClaim(event: LogDarknodeClaim): void {
 export function handleWithdraw(call: WithdrawCall): void {
     let darknodePayment = DarknodePayment.bind(call.to);
 
-    let BTCGateway = Gateway.bind(Address.fromString(btcGateway.slice(2)));
-    let ZECGateway = Gateway.bind(Address.fromString(zecGateway.slice(2)));
-    let BCHGateway = Gateway.bind(Address.fromString(bchGateway.slice(2)));
+    let btcToken = Address.fromString(btc.slice(2));
+    let zecToken = Address.fromString(zec.slice(2));
+    let bchToken = Address.fromString(bch.slice(2));
 
     let darknodeID = call.inputs._darknode;
+
     let darknode = getDarknode(darknodeID);
 
-    let darknodeAddress: Address = Address.fromHexString(darknodeID.toHexString()) as Address;
+    darknode.balanceBTC = darknodePayment.darknodeBalances(
+        darknodeID,
+        btcToken
+    );
 
-    let btcToken = BTCGateway.token();
-    let zecToken = ZECGateway.token();
-    let bchToken = BCHGateway.token();
+    darknode.balanceZEC = darknodePayment.darknodeBalances(
+        darknodeID,
+        zecToken
+    );
 
-    let btcCall = darknodePayment.try_darknodeBalances(darknodeAddress, btcToken);
-    if (!btcCall.reverted) { darknode.balanceBTC = btcCall.value; }
-    let zecCall = darknodePayment.try_darknodeBalances(darknodeAddress, zecToken);
-    if (!zecCall.reverted) { darknode.balanceZEC = zecCall.value; }
-    let bchCall = darknodePayment.try_darknodeBalances(darknodeAddress, bchToken);
-    if (!bchCall.reverted) { darknode.balanceBCH = bchCall.value; }
+    darknode.balanceBCH = darknodePayment.darknodeBalances(
+        darknodeID,
+        bchToken
+    );
+
+    let token = RenERC20.bind(call.inputs._token);
+    let symbol = token.symbol();
+    let balance = darknodePayment.darknodeBalances(
+        Address.fromHexString(darknodeID.toHexString()) as Address,
+        token._address
+    );
+    darknode.balances = setValue(
+        darknode.balances,
+        darknode.id,
+        "balances",
+        symbol,
+        balance
+    );
 
     darknode.save();
 

@@ -3,8 +3,9 @@
 ### RenVM Subgraph
 
 Currently deployed at
-* Mainnet: https://thegraph.com/explorer/subgraph/renproject/renvm
-* Testnet: https://thegraph.com/explorer/subgraph/renproject/renvm-testnet
+
+-   Mainnet: https://thegraph.com/explorer/subgraph/renproject/renvm
+-   Testnet: https://thegraph.com/explorer/subgraph/renproject/renvm-testnet
 
 ## Examples
 
@@ -27,10 +28,10 @@ GraphQL query:
 ```graphql
 query getRenVMData {
     renVM(id: "1") {
-      numberOfDarknodes
-      numberOfDarknodesLastEpoch
-      numberOfDarknodesNextEpoch
-  }
+        numberOfDarknodes
+        numberOfDarknodesLastEpoch
+        numberOfDarknodesNextEpoch
+    }
 }
 ```
 
@@ -39,6 +40,7 @@ query getRenVMData {
 To setup the graph node, follow the instructions at <https://thegraph.com/docs/quick-start>.
 
 Some things to note:
+
 1. Pass `-d` to `ganache-cli` so generate contracts with the same addresses as `config/ganache.json`.
 2. If you restart `ganache-cli`, you may have to run `sudo rm -r data/postgres` in the `graph-node/docker` directory.
 
@@ -75,7 +77,6 @@ Then run one of:
 
 ```sh
 yarn deploy:mainnet
-yarn deploy:chaosnet
 yarn deploy:testnet
 yarn deploy:devnet
 ```

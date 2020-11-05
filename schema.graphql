@@ -1,143 +1,189 @@
 enum TransactionType {
-  mint
-  burn
+    mint
+    burn
 }
 
 type Transaction @entity {
-  id: ID!
-  timestamp: BigInt
-  asset: String!
-  type: TransactionType!
-  amount: BigInt!
-  feeRate: BigInt!
-  integrator: Bytes
-  transactionTo: Bytes
-  burnRecipient: Bytes
-  destination: Bytes
+    id: ID!
+    timestamp: BigInt
+    asset: String!
+    type: TransactionType!
+    amount: BigInt!
+    feeRate: BigInt!
+    integrator: Bytes
+    transactionTo: Bytes
+    burnRecipient: Bytes
+    destination: Bytes
+}
+
+type Asset @entity {
+    id: ID!
+    gatewayAddress: String!
+    tokenAddress: String!
+    symbol: String!
+}
+
+type AssetValue @entity {
+    id: ID!
+    symbol: String!
+    asset: Asset
+    value: BigInt!
 }
 
 type Darknode @entity {
-  id: ID!
-  operator: Bytes!
-  bond: BigInt!
-  publicKey: Bytes!
-  registeredAt: BigInt!
-  deregisteredAt: BigInt!
+    id: ID!
+    operator: Bytes!
+    bond: BigInt!
+    publicKey: Bytes!
+    registeredAt: BigInt!
+    deregisteredAt: BigInt!
 
-  lastClaimedEpoch: BigInt
-  previousLastClaimedEpoch: BigInt
+    lastClaimedEpoch: BigInt
+    previousLastClaimedEpoch: BigInt
 
-  balanceBTC: BigInt!
-  balanceZEC: BigInt!
-  balanceBCH: BigInt!
+    balances: [AssetValue!]!
+
+    # DEPRECATED
+
+    balanceBTC: BigInt!
+    balanceZEC: BigInt!
+    balanceBCH: BigInt!
 }
 
 type Epoch @entity {
-  id: ID!
-  epochhash: BigInt!
-  timestamp: BigInt!
-  blockNumber: BigInt!
-  nextEpochBlockNumber: BigInt!
-  
-  minimumBond: BigInt!
-  minimumEpochInterval: BigInt!
+    id: ID!
+    epochhash: BigInt!
+    timestamp: BigInt!
+    blockNumber: BigInt!
+    nextEpochBlockNumber: BigInt!
 
-  numberOfDarknodes: BigInt!
-  numberOfDarknodesLastEpoch: BigInt!
-  rewardShareBTC: BigInt!
-  rewardShareZEC: BigInt!
-  rewardShareBCH: BigInt!
+    minimumBond: BigInt!
+    minimumEpochInterval: BigInt!
 
-  totalRewardShareBTC: BigInt!
-  totalRewardShareZEC: BigInt!
-  totalRewardShareBCH: BigInt!
+    numberOfDarknodes: BigInt!
+    numberOfDarknodesLastEpoch: BigInt!
+
+    rewardShares: [AssetValue!]!
+    cumulativeRewardShares: [AssetValue!]!
+
+    # DEPRECATED
+
+    rewardShareBTC: BigInt!
+    rewardShareZEC: BigInt!
+    rewardShareBCH: BigInt!
+
+    totalRewardShareBTC: BigInt!
+    totalRewardShareZEC: BigInt!
+    totalRewardShareBCH: BigInt!
 }
 
 # Data accumulated and condensed into day stats
 type RenVM @entity {
-  id: ID! # fixed to '1'
+    id: ID! # fixed to '1'
+    # The most recent Ethereum block in which RenVM had activity.
+    activeBlock: BigInt!
+    activeTimestamp: BigInt!
+    previousActiveBlock: BigInt!
+    previousActiveTimestamp: BigInt!
 
-  # The most recent Ethereum block in which RenVM had activity.
-  activeBlock: BigInt!
-  activeTimestamp: BigInt!
-  previousActiveBlock: BigInt!
-  previousActiveTimestamp: BigInt!
+    numberOfDarknodes: BigInt!
+    numberOfDarknodesLastEpoch: BigInt!
+    numberOfDarknodesNextEpoch: BigInt!
 
-  numberOfDarknodes: BigInt!
-  numberOfDarknodesLastEpoch: BigInt!
-  numberOfDarknodesNextEpoch: BigInt!
+    minimumBond: BigInt!
 
-  minimumBond: BigInt!
+    # Epochs
+    minimumEpochInterval: BigInt!
+    currentEpoch: Epoch
+    previousEpoch: Epoch
+    deregistrationInterval: BigInt!
 
-  # Epochs
-  minimumEpochInterval: BigInt!
-  currentEpoch: Epoch
-  previousEpoch: Epoch
-  deregistrationInterval: BigInt!
+    # Fees
+    btcMintFee: Int!
+    btcBurnFee: Int!
+    zecMintFee: Int!
+    zecBurnFee: Int!
+    bchMintFee: Int!
+    bchBurnFee: Int!
 
-  # Fees
-  btcMintFee: Int!
-  btcBurnFee: Int!
-  zecMintFee: Int!
-  zecBurnFee: Int!
-  bchMintFee: Int!
-  bchBurnFee: Int!
+    mintFee: [AssetValue!]!
+    burnFee: [AssetValue!]!
 
-  # Cycles
-  currentCycle: BigInt!
-  previousCycle: BigInt!
-  currentCyclePayoutPercent: BigInt!
-  cycleStartTime: BigInt!
+    # Cycles
+    currentCycle: BigInt!
+    previousCycle: BigInt!
+    currentCyclePayoutPercent: BigInt!
+    cycleStartTime: BigInt!
 
+    txCount: [AssetValue!]!
+    locked: [AssetValue!]!
+    volume: [AssetValue!]!
+    fees: [AssetValue!]!
 
-  totalTxCountBTC: BigInt!
-  totalLockedBTC: BigInt!
-  totalVolumeBTC: BigInt!
+    # DEPRECATED
 
-  totalTxCountZEC: BigInt!
-  totalLockedZEC: BigInt!
-  totalVolumeZEC: BigInt!
+    totalTxCountBTC: BigInt!
+    totalLockedBTC: BigInt!
+    totalVolumeBTC: BigInt!
 
-  totalTxCountBCH: BigInt!
-  totalLockedBCH: BigInt!
-  totalVolumeBCH: BigInt!
+    totalTxCountZEC: BigInt!
+    totalLockedZEC: BigInt!
+    totalVolumeZEC: BigInt!
+
+    totalTxCountBCH: BigInt!
+    totalLockedBCH: BigInt!
+    totalVolumeBCH: BigInt!
 }
 
 # Data accumulated and condensed into day stats
 type Integrator @entity {
-  id: ID!
-  date: Int!
+    id: ID!
+    date: Int!
 
-  contractAddress: Bytes!
+    contractAddress: Bytes!
 
-  txCountBTC: BigInt!
-  lockedBTC: BigInt!
-  volumeBTC: BigInt!
+    txCount: [AssetValue!]!
+    locked: [AssetValue!]!
+    volume: [AssetValue!]!
+    fees: [AssetValue!]!
 
-  txCountZEC: BigInt!
-  lockedZEC: BigInt!
-  volumeZEC: BigInt!
+    # DEPRECATED
 
-  txCountBCH: BigInt!
-  lockedBCH: BigInt!
-  volumeBCH: BigInt!
+    txCountBTC: BigInt!
+    lockedBTC: BigInt!
+    volumeBTC: BigInt!
+
+    txCountZEC: BigInt!
+    lockedZEC: BigInt!
+    volumeZEC: BigInt!
+
+    txCountBCH: BigInt!
+    lockedBCH: BigInt!
+    volumeBCH: BigInt!
 }
 
 type IntegratorContract @entity {
-  id: ID!
-  date: Int!
+    id: ID!
+    date: Int!
 
-  contractAddress: Bytes!
+    contractAddress: Bytes!
 
-  txCountBTC: BigInt!
-  lockedBTC: BigInt!
-  volumeBTC: BigInt!
+    txCount: [AssetValue!]!
+    locked: [AssetValue!]!
+    volume: [AssetValue!]!
+    fees: [AssetValue!]!
 
-  txCountZEC: BigInt!
-  lockedZEC: BigInt!
-  volumeZEC: BigInt!
+    # DEPRECATED
 
-  txCountBCH: BigInt!
-  lockedBCH: BigInt!
-  volumeBCH: BigInt!
+    txCountBTC: BigInt!
+    lockedBTC: BigInt!
+    volumeBTC: BigInt!
+
+    txCountZEC: BigInt!
+    lockedZEC: BigInt!
+    volumeZEC: BigInt!
+
+    txCountBCH: BigInt!
+    lockedBCH: BigInt!
+    volumeBCH: BigInt!
 }

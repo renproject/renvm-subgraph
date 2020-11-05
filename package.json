@@ -1,23 +1,25 @@
 {
-  "name": "renvm",
-  "license": "MIT",
-  "scripts": {
-    "build": "graph build",
-    "prepare": "mustache ./config/${NETWORK:-ganache}.json subgraph.template.yaml > subgraph.yaml && mustache ./config/${NETWORK:-ganache}.json src/_config.template.yaml > src/_config.ts",
-    "codegen": "npm run prepare && graph codegen --output-dir ./generated",
-    "deploy-remote": "npm run codegen && npm run build && graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ${NAME:-null}",
-    "create:local": "graph create --node http://localhost:8020/ renproject/renvm",
-    "deploy:local": "npm run codegen && graph deploy --ipfs http://localhost:5001 --node http://localhost:8020/ renproject/renvm",
-    "deploy:mainnet": "NETWORK=mainnet NAME=renproject/renvm npm run deploy-remote",
-    "deploy:chaosnet": "NETWORK=chaosnet NAME=noiach/renvm-chaosnet npm run deploy-remote",
-    "deploy:testnet": "NETWORK=testnet NAME=renproject/renvm-testnet npm run deploy-remote",
-    "deploy:devnet": "NETWORK=devnet NAME=noiach/renvm-devnet npm run deploy-remote"
-  },
-  "dependencies": {
-    "@graphprotocol/graph-cli": "0.18.0",
-    "@graphprotocol/graph-ts": "0.18.1"
-  },
-  "devDependencies": {
-    "mustache": "^4.0.1"
-  }
+    "name": "renvm",
+    "license": "MIT",
+    "scripts": {
+        "build": "graph build",
+        "prepare": "mustache ./config/${NETWORK:-testnet}.json subgraph.template.yaml > subgraph.yaml && mustache ./config/${NETWORK:-testnet}.json src/_config.template.yaml > src/_config.ts",
+        "codegen": "npm run prepare && graph codegen --output-dir ./generated",
+        "deploy-remote": "npm run codegen && npm run build && graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ${NAME:-null}",
+        "create:local": "graph create --node http://localhost:8020/ renproject/renvm",
+        "deploy:local": "npm run codegen && graph deploy --ipfs http://localhost:5001 --node http://localhost:8020/ renproject/renvm",
+        "deploy:mainnet": "NETWORK=mainnet NAME=renproject/renvm npm run deploy-remote",
+        "deploy:testnet": "NETWORK=testnet NAME=renproject/renvm-testnet npm run deploy-remote",
+        "deploy:devnet": "NETWORK=devnet NAME=noiach/renvm-devnet npm run deploy-remote"
+    },
+    "dependencies": {
+        "@graphprotocol/graph-cli": "0.18.0",
+        "@graphprotocol/graph-ts": "0.18.1"
+    },
+    "devDependencies": {
+        "mustache": "^4.0.1"
+    },
+    "prettier": {
+        "tabWidth": 4
+    }
 }

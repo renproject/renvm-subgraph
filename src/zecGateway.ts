@@ -38,10 +38,18 @@ export function handleMint(call: MintCall): void {
             integrator.lockedZEC = integrator.lockedZEC.plus(tx.amount);
             integrator.save();
 
-            let integratorContract = getIntegratorContract(tx.integrator as Bytes);
-            integratorContract.txCountZEC = integratorContract.txCountZEC.plus(one());
-            integratorContract.volumeZEC = integratorContract.volumeZEC.plus(tx.amount);
-            integratorContract.lockedZEC = integratorContract.lockedZEC.plus(tx.amount);
+            let integratorContract = getIntegratorContract(
+                tx.integrator as Bytes,
+            );
+            integratorContract.txCountZEC = integratorContract.txCountZEC.plus(
+                one(),
+            );
+            integratorContract.volumeZEC = integratorContract.volumeZEC.plus(
+                tx.amount,
+            );
+            integratorContract.lockedZEC = integratorContract.lockedZEC.plus(
+                tx.amount,
+            );
             integratorContract.save();
         }
     }
@@ -50,7 +58,13 @@ export function handleMint(call: MintCall): void {
 export function handleBurn(call: BurnCall): void {
     let gateway = Gateway.bind(call.to);
 
-    let txid = "burn_" + gateway.nextN().toString() + "_" + call.inputs._to.toHexString() + "_" + call.inputs._amount.toString();
+    let txid =
+        "burn_" +
+        gateway.nextN().toString() +
+        "_" +
+        call.inputs._to.toHexString() +
+        "_" +
+        call.inputs._amount.toString();
     let tx = new Transaction(txid);
 
     tx.timestamp = call.block.timestamp;
@@ -81,9 +95,15 @@ export function handleBurn(call: BurnCall): void {
         integrator.save();
 
         let integratorContract = getIntegratorContract(tx.integrator as Bytes);
-        integratorContract.txCountZEC = integratorContract.txCountZEC.plus(one());
-        integratorContract.volumeZEC = integratorContract.volumeZEC.plus(tx.amount);
-        integratorContract.lockedZEC = integratorContract.lockedZEC.plus(tx.amount);
+        integratorContract.txCountZEC = integratorContract.txCountZEC.plus(
+            one(),
+        );
+        integratorContract.volumeZEC = integratorContract.volumeZEC.plus(
+            tx.amount,
+        );
+        integratorContract.lockedZEC = integratorContract.lockedZEC.plus(
+            tx.amount,
+        );
         integratorContract.save();
     }
 }

@@ -1,6 +1,13 @@
 import { BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 
-import { Darknode, Integrator, IntegratorContract, RenVM } from "../generated/schema";
+import {
+    Asset,
+    AssetValue,
+    Darknode,
+    Integrator,
+    IntegratorContract,
+    RenVM,
+} from "../generated/schema";
 import { resolveIntegratorID } from "./integrators";
 
 // @ts-ignore - typescript doesn't like i32
@@ -35,6 +42,11 @@ export const getIntegrator = (contractAddress: Bytes): Integrator => {
         integrator.lockedBCH = zero();
         integrator.volumeBCH = zero();
 
+        integrator.txCount = [];
+        integrator.locked = [];
+        integrator.volume = [];
+        integrator.fees = [];
+
         integrator.date = date;
     }
 
@@ -47,11 +59,15 @@ export const getIntegrator = (contractAddress: Bytes): Integrator => {
     return integrator as Integrator;
 };
 
-export const getIntegratorContract = (contractAddress: Bytes): IntegratorContract => {
+export const getIntegratorContract = (
+    contractAddress: Bytes
+): IntegratorContract => {
     let date: I32 = 0;
 
     let integratorContractID: string = contractAddress.toHexString();
-    let integratorContract: IntegratorContract | null = IntegratorContract.load(integratorContractID);
+    let integratorContract: IntegratorContract | null = IntegratorContract.load(
+        integratorContractID
+    );
 
     if (integratorContract === null) {
         integratorContract = new IntegratorContract(integratorContractID);
@@ -67,6 +83,11 @@ export const getIntegratorContract = (contractAddress: Bytes): IntegratorContrac
         integratorContract.lockedBCH = zero();
         integratorContract.volumeBCH = zero();
 
+        integratorContract.txCount = [];
+        integratorContract.locked = [];
+        integratorContract.volume = [];
+        integratorContract.fees = [];
+
         integratorContract.date = date;
     }
 
@@ -80,7 +101,6 @@ export const getIntegratorContract = (contractAddress: Bytes): IntegratorContrac
 };
 
 export const getRenVM = (updateAtBlock: ethereum.Block): RenVM => {
-
     let renVM: RenVM | null = RenVM.load("1");
 
     if (renVM === null) {
@@ -123,6 +143,13 @@ export const getRenVM = (updateAtBlock: ethereum.Block): RenVM => {
         renVM.totalLockedBCH = zero();
         renVM.totalVolumeBCH = zero();
 
+        renVM.mintFee = [];
+        renVM.burnFee = [];
+        renVM.txCount = [];
+        renVM.locked = [];
+        renVM.volume = [];
+        renVM.fees = [];
+
         renVM.save();
     }
 
@@ -137,10 +164,8 @@ export const getRenVM = (updateAtBlock: ethereum.Block): RenVM => {
 };
 
 export const getDarknode = (darknodeID: Bytes): Darknode => {
-
     let darknode: Darknode | null = Darknode.load(darknodeID.toHexString());
     if (darknode == null) {
-
         darknode = new Darknode(darknodeID.toHexString());
 
         darknode.operator = Bytes.fromI32(0) as Bytes;
@@ -156,9 +181,82 @@ export const getDarknode = (darknodeID: Bytes): Darknode => {
         darknode.balanceZEC = zero();
         darknode.balanceBCH = zero();
 
+        darknode.balances = [];
+
         darknode.save();
     }
 
     // tslint:disable-next-line: no-unnecessary-type-assertion
     return darknode as Darknode;
+};
+
+const updateValue = (
+    array: string[],
+    itemID: string,
+    field: string,
+    symbol: string,
+    value: BigInt,
+    set: boolean,
+    add: boolean,
+    subtract: boolean
+): string[] => {
+    let id = itemID + "_" + field + "_" + symbol;
+
+    let asset = Asset.load(symbol);
+    let assetSymbol: string | null = asset === null ? null : asset.symbol;
+
+    let assetValue = AssetValue.load(id);
+    if (assetValue == null) {
+        assetValue = new AssetValue(id);
+        assetValue.symbol = symbol;
+        assetValue.asset = assetSymbol;
+        assetValue.value = zero();
+    }
+
+    assetValue.value = set
+        ? value
+        : add
+        ? assetValue.value.plus(value)
+        : subtract
+        ? assetValue.value.minus(value)
+        : assetValue.value;
+    assetValue.save();
+
+    for (let i = 0; i < array.length; i++) {
+        if (array[i] == id) {
+            return array;
+        }
+    }
+    array.push(id);
+    return array;
+};
+
+export const setValue = (
+    array: string[],
+    itemID: string,
+    field: string,
+    asset: string,
+    value: BigInt
+): string[] => {
+    return updateValue(array, itemID, field, asset, value, true, false, false);
+};
+
+export const addValue = (
+    array: string[],
+    itemID: string,
+    field: string,
+    asset: string,
+    value: BigInt
+): string[] => {
+    return updateValue(array, itemID, field, asset, value, false, true, false);
+};
+
+export const subValue = (
+    array: string[],
+    itemID: string,
+    field: string,
+    asset: string,
+    value: BigInt
+): string[] => {
+    return updateValue(array, itemID, field, asset, value, false, false, true);
 };

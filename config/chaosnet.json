@@ -1,9 +1,0 @@
-{
-    "network": "mainnet",
-    "darknodeRegistry": "0x7C08FF068b7FF6d7d2f431f08B8C2e536ed693DD",
-    "darknodePayment": "0xdf2a33Bf44F917b85a716aA1e98Af0bBa4085dEc",
-    "btcGateway": "0xD4d496632b9aF3122FB5DdbF0614aA82effa9F99",
-    "zecGateway": "0x37A4860728E292E5852B215c46DBE7a18862EF93",
-    "bchGateway": "0xc3AC15BEc6dA89e8DC5c4d1b4d0C785547676e3a",
-    "startBlock": 9828200
-}
