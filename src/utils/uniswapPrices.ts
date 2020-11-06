@@ -4,16 +4,25 @@ import { RenERC20 } from "../../generated/templates/Gateway/RenERC20";
 import { UniswapExchange } from "../../generated/templates/Gateway/UniswapExchange";
 import { UniswapFactory } from "../../generated/templates/Gateway/UniswapFactory";
 import { uniswapFactoryAddress, usdAddress, wethAddress } from "../_config";
-import { I32, zeroDot } from "./common";
+import { I32, oneDot, zeroDot } from "./common";
 
 let uniswapFactory = Address.fromString(uniswapFactoryAddress);
 let weth = Address.fromString(wethAddress);
 let usd = Address.fromString(usdAddress);
 
-const getTokenDecimals = (token: Address): ethereum.CallResult<I32> => {
-    if (token.equals(weth) || token.equals(usd)) {
-        return ethereum.CallResult.fromValue(18);
+/**
+ * Calculate 10**e.
+ */
+export function exponent(e: BigDecimal): BigDecimal {
+    let result = BigInt.fromI32(1).toBigDecimal();
+    let base = BigInt.fromI32(10).toBigDecimal();
+    for (let i = zeroDot(); i.lt(e); i = i.plus(oneDot())) {
+        result = result.times(base);
     }
+    return result;
+}
+
+const getTokenDecimals = (token: Address): ethereum.CallResult<I32> => {
     let tokenContract = RenERC20.bind(token);
     return tokenContract.try_decimals();
 };
@@ -63,8 +72,8 @@ const getPairPrice = (token1: Address, token2: Address): BigDecimal => {
 
     return token2Reserve
         .toBigDecimal()
-        .div(token2Decimals)
-        .div(token1Reserve.toBigDecimal().div(token1Decimals));
+        .div(exponent(token2Decimals))
+        .div(token1Reserve.toBigDecimal().div(exponent(token1Decimals)));
 };
 
 export const getPriceInEth = (token1: Address): BigDecimal => {
@@ -73,6 +82,6 @@ export const getPriceInEth = (token1: Address): BigDecimal => {
 
 export const getPriceInUsd = (token1: Address): BigDecimal => {
     let priceInEth: BigDecimal = getPriceInEth(token1);
-    let ethPriceInUsd: BigDecimal = getPairPrice(token1, weth);
+    let ethPriceInUsd: BigDecimal = getPairPrice(weth, usd);
     return priceInEth.times(ethPriceInUsd);
 };

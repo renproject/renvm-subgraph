@@ -21,6 +21,9 @@ type Asset @entity {
     gatewayAddress: String!
     tokenAddress: String!
     symbol: String!
+    decimals: BigInt!
+    priceInEth: BigDecimal!
+    priceInUsd: BigDecimal!
 }
 
 type ValueWithAsset @entity {

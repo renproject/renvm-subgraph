@@ -27,6 +27,30 @@ dataSources:
                 handler: handleLogGatewayRegistered
           file: ./src/gatewayRegistry.ts
     - kind: ethereum/contract
+      name: GatewayRegistryVDot3
+      network: {{network}}
+      source:
+          address: "{{gatewayRegistryVDot3}}"
+          abi: GatewayRegistry
+          startBlock: {{startBlock}}
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.4
+          language: wasm/assemblyscript
+          entities:
+              - RenVM
+          abis:
+              - name: GatewayRegistry
+                file: ./abis/GatewayRegistry.json
+              - name: Gateway
+                file: ./abis/Gateway.json
+              - name: RenERC20
+                file: ./abis/RenERC20LogicV1.json
+          eventHandlers:
+              - event: LogGatewayRegistered(string,indexed string,indexed address,indexed address)
+                handler: handleLogGatewayRegistered
+          file: ./src/gatewayRegistry.ts
+    - kind: ethereum/contract
       name: BTCGateway
       network: {{network}}
       source:
@@ -159,6 +183,10 @@ dataSources:
                 file: ./abis/Gateway.json
               - name: RenERC20
                 file: ./abis/RenERC20LogicV1.json
+              - name: UniswapFactory
+                file: ./abis/UniswapFactory.json
+              - name: UniswapExchange
+                file: ./abis/UniswapExchange.json
           callHandlers:
               - function: changeCycle()
                 handler: handleChangeCycle

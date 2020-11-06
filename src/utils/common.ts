@@ -24,6 +24,10 @@ export const one = (): BigInt => {
     return BigInt.fromI32(1);
 };
 
+export const oneDot = (): BigDecimal => {
+    return BigInt.fromI32(1).toBigDecimal();
+};
+
 export const getIntegrator = (contractAddress: Bytes): Integrator => {
     let date: I32 = 0;
 

@@ -6,6 +6,7 @@
     "darknodePayment": "0x098e1708b920EFBdD7afe33Adb6a4CBa30c370B9",
 
     "gatewayRegistry": "0xe80d347DF1209a76DD9d2319d62912ba98C54DDD",
+    "gatewayRegistryVDot3": "0xe80d347DF1209a76DD9d2319d62912ba98C54DDD",
     "uniswapFactory": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
     "weth": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
     "usd": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",

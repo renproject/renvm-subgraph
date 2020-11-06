@@ -8,7 +8,7 @@ import { RenERC20 } from "../generated/GatewayRegistry/RenERC20";
 import { Asset } from "../generated/schema";
 import { Gateway as GatewayTemplate } from "../generated/templates";
 import { setAmount } from "./utils/assetAmount";
-import { getRenVM, zero } from "./utils/common";
+import { getRenVM, zero, zeroDot } from "./utils/common";
 import { setValue } from "./utils/valueWithAsset";
 
 export function handleLogGatewayRegistered(event: LogGatewayRegistered): void {
@@ -17,6 +17,7 @@ export function handleLogGatewayRegistered(event: LogGatewayRegistered): void {
     let token = RenERC20.bind(gateway.token());
 
     let symbol = token.symbol();
+    let decimals = token.decimals();
 
     GatewayTemplate.create(gatewayAddress);
 
@@ -25,6 +26,9 @@ export function handleLogGatewayRegistered(event: LogGatewayRegistered): void {
     let asset: Asset | null = Asset.load(symbol);
     if (asset === null) {
         asset = new Asset(symbol);
+        asset.decimals = BigInt.fromI32(decimals);
+        asset.priceInEth = zeroDot();
+        asset.priceInUsd = zeroDot();
 
         renVM.txCount = setValue(
             renVM.txCount,

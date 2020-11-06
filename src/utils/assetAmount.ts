@@ -1,8 +1,9 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
+import { RenERC20 } from "../../generated/GatewayRegistry/RenERC20";
 import { Asset, AssetAmount } from "../../generated/schema";
 import { zero, zeroDot } from "./common";
-import { getPriceInEth, getPriceInUsd } from "./uniswapPrices";
+import { exponent, getPriceInEth, getPriceInUsd } from "./uniswapPrices";
 
 const updateAmount = (
     array: string[],
@@ -32,18 +33,48 @@ const updateAmount = (
     let assetPriceInEth = asset
         ? getPriceInEth(Address.fromString(asset.tokenAddress))
         : zeroDot();
-
     let assetPriceInUsd = asset
         ? getPriceInUsd(Address.fromString(asset.tokenAddress))
         : zeroDot();
+    if (asset) {
+        asset.priceInEth = assetPriceInEth;
+        asset.priceInUsd = assetPriceInUsd;
+        asset.save();
+    }
+
+    let decimals = asset ? asset.decimals.toBigDecimal() : zeroDot();
+    let scaledPriceInEth = decimals.gt(zeroDot())
+        ? assetPriceInEth.div(exponent(decimals))
+        : assetPriceInEth;
+    let scaledPriceInUsd = decimals.gt(zeroDot())
+        ? assetPriceInUsd.div(exponent(decimals))
+        : assetPriceInUsd;
 
     let amountDecimal = amount.toBigDecimal();
     let amountInEth: BigDecimal = amountDecimal
-        .times(assetPriceInEth)
+        .times(scaledPriceInEth)
         .truncate(18);
     let amountInUsd: BigDecimal = amountDecimal
-        .times(assetPriceInUsd)
+        .times(scaledPriceInUsd)
         .truncate(2);
+
+    // Check if previously there was no price available.
+    if (
+        assetAmount.amount.gt(zero()) &&
+        assetAmount.amountInUsd.equals(zeroDot()) &&
+        amountInUsd.gt(zeroDot())
+    ) {
+        // Use current price for historical values. This relies on the initial
+        // price on Uniswap being set correctly.
+        assetAmount.amountInEth = assetAmount.amount
+            .toBigDecimal()
+            .times(scaledPriceInEth)
+            .truncate(18);
+        assetAmount.amountInUsd = assetAmount.amount
+            .toBigDecimal()
+            .times(scaledPriceInUsd)
+            .truncate(2);
+    }
 
     assetAmount.amount = set
         ? amount
