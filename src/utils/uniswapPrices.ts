@@ -77,11 +77,12 @@ const getPairPrice = (token1: Address, token2: Address): BigDecimal => {
 };
 
 export const getPriceInEth = (token1: Address): BigDecimal => {
-    return getPairPrice(token1, weth);
+    let priceInEth = getPairPrice(token1, weth);
+    return priceInEth.truncate(18);
 };
 
 export const getPriceInUsd = (token1: Address): BigDecimal => {
     let priceInEth: BigDecimal = getPriceInEth(token1);
     let ethPriceInUsd: BigDecimal = getPairPrice(weth, usd);
-    return priceInEth.times(ethPriceInUsd);
+    return priceInEth.times(ethPriceInUsd).truncate(2);
 };

@@ -1,6 +1,5 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
-import { RenERC20 } from "../../generated/GatewayRegistry/RenERC20";
 import { Asset, AssetAmount } from "../../generated/schema";
 import { zero, zeroDot } from "./common";
 import { exponent, getPriceInEth, getPriceInUsd } from "./uniswapPrices";
@@ -13,7 +12,8 @@ const updateAmount = (
     amount: BigInt,
     set: boolean,
     add: boolean,
-    subtract: boolean
+    subtract: boolean,
+    updatePrice: boolean
 ): string[] => {
     let id = itemID + "_" + field + "_" + symbol;
 
@@ -58,14 +58,16 @@ const updateAmount = (
         .times(scaledPriceInUsd)
         .truncate(2);
 
-    // Check if previously there was no price available.
+    // Update the price for the previous amount stored. This is called when
+    // 1) there was no price data previously (this relies on the initial price
+    //    on Uniswap being set correctly)
+    // 2) the `updatePrice` parameter is set, such as for `locked` amounts.
     if (
-        assetAmount.amount.gt(zero()) &&
-        assetAmount.amountInUsd.equals(zeroDot()) &&
-        amountInUsd.gt(zeroDot())
+        (assetAmount.amount.gt(zero()) &&
+            assetAmount.amountInUsd.equals(zeroDot()) &&
+            amountInUsd.gt(zeroDot())) ||
+        updatePrice
     ) {
-        // Use current price for historical values. This relies on the initial
-        // price on Uniswap being set correctly.
         assetAmount.amountInEth = assetAmount.amount
             .toBigDecimal()
             .times(scaledPriceInEth)
@@ -124,6 +126,7 @@ export const setAmount = (
         amount,
         true,
         false,
+        false,
         false
     );
 };
@@ -133,7 +136,8 @@ export const addAmount = (
     itemID: string,
     field: string,
     symbol: string,
-    amount: BigInt
+    amount: BigInt,
+    updatePrice: boolean
 ): string[] => {
     return updateAmount(
         array,
@@ -143,7 +147,8 @@ export const addAmount = (
         amount,
         false,
         true,
-        false
+        false,
+        updatePrice
     );
 };
 
@@ -152,7 +157,8 @@ export const subAmount = (
     itemID: string,
     field: string,
     symbol: string,
-    amount: BigInt
+    amount: BigInt,
+    updatePrice: boolean
 ): string[] => {
     return updateAmount(
         array,
@@ -162,6 +168,7 @@ export const subAmount = (
         amount,
         false,
         false,
-        true
+        true,
+        updatePrice
     );
 };

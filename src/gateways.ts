@@ -43,14 +43,16 @@ export function handleMint(call: MintCall): void {
         renVM.id,
         "locked",
         symbol,
-        tx.amount
+        tx.amount,
+        true
     );
     renVM.volume = addAmount(
         renVM.volume,
         renVM.id,
         "volume",
         symbol,
-        tx.amount
+        tx.amount,
+        false
     );
     renVM.fees = addAmount(
         renVM.fees,
@@ -59,7 +61,8 @@ export function handleMint(call: MintCall): void {
         symbol,
         tx.amount
             .times(BigInt.fromI32(gateway.mintFee()))
-            .div(BigInt.fromI32(10000))
+            .div(BigInt.fromI32(10000)),
+        false
     );
     renVM.mintFee = setValue(
         renVM.mintFee,
@@ -92,14 +95,16 @@ export function handleMint(call: MintCall): void {
                 integrator.id,
                 "locked",
                 symbol,
-                tx.amount
+                tx.amount,
+                true
             );
             integrator.volume = addAmount(
                 integrator.volume,
                 integrator.id,
                 "volume",
                 symbol,
-                tx.amount
+                tx.amount,
+                false
             );
             integrator.fees = addAmount(
                 integrator.fees,
@@ -108,7 +113,8 @@ export function handleMint(call: MintCall): void {
                 symbol,
                 tx.amount
                     .times(BigInt.fromI32(gateway.mintFee()))
-                    .div(BigInt.fromI32(10000))
+                    .div(BigInt.fromI32(10000)),
+                false
             );
             integrator.save();
 
@@ -127,14 +133,16 @@ export function handleMint(call: MintCall): void {
                 integratorContract.id,
                 "locked",
                 symbol,
-                tx.amount
+                tx.amount,
+                true
             );
             integratorContract.volume = addAmount(
                 integratorContract.volume,
                 integratorContract.id,
                 "volume",
                 symbol,
-                tx.amount
+                tx.amount,
+                false
             );
             integratorContract.fees = addAmount(
                 integratorContract.fees,
@@ -143,7 +151,8 @@ export function handleMint(call: MintCall): void {
                 symbol,
                 tx.amount
                     .times(BigInt.fromI32(gateway.mintFee()))
-                    .div(BigInt.fromI32(10000))
+                    .div(BigInt.fromI32(10000)),
+                false
             );
             integratorContract.save();
         }
@@ -186,14 +195,16 @@ export function handleBurn(call: BurnCall): void {
             tx.amount
                 .times(BigInt.fromI32(gateway.burnFee()))
                 .div(BigInt.fromI32(10000))
-        )
+        ),
+        true
     );
     renVM.volume = addAmount(
         renVM.volume,
         renVM.id,
         "volume",
         symbol,
-        tx.amount
+        tx.amount,
+        false
     );
     renVM.fees = addAmount(
         renVM.fees,
@@ -202,7 +213,8 @@ export function handleBurn(call: BurnCall): void {
         symbol,
         tx.amount
             .times(BigInt.fromI32(gateway.burnFee()))
-            .div(BigInt.fromI32(10000))
+            .div(BigInt.fromI32(10000)),
+        false
     );
     renVM.mintFee = setValue(
         renVM.mintFee,
@@ -239,14 +251,16 @@ export function handleBurn(call: BurnCall): void {
                 tx.amount
                     .times(BigInt.fromI32(gateway.burnFee()))
                     .div(BigInt.fromI32(10000))
-            )
+            ),
+            true
         );
         integrator.volume = addAmount(
             integrator.volume,
             integrator.id,
             "volume",
             symbol,
-            tx.amount
+            tx.amount,
+            false
         );
         integrator.fees = addAmount(
             integrator.fees,
@@ -255,7 +269,8 @@ export function handleBurn(call: BurnCall): void {
             symbol,
             tx.amount
                 .times(BigInt.fromI32(gateway.burnFee()))
-                .div(BigInt.fromI32(10000))
+                .div(BigInt.fromI32(10000)),
+            false
         );
         integrator.save();
 
@@ -276,14 +291,16 @@ export function handleBurn(call: BurnCall): void {
                 tx.amount
                     .times(BigInt.fromI32(gateway.burnFee()))
                     .div(BigInt.fromI32(10000))
-            )
+            ),
+            true
         );
         integratorContract.volume = addAmount(
             integratorContract.volume,
             integratorContract.id,
             "volume",
             symbol,
-            tx.amount
+            tx.amount,
+            false
         );
         integratorContract.fees = addAmount(
             integratorContract.fees,
@@ -292,7 +309,8 @@ export function handleBurn(call: BurnCall): void {
             symbol,
             tx.amount
                 .times(BigInt.fromI32(gateway.burnFee()))
-                .div(BigInt.fromI32(10000))
+                .div(BigInt.fromI32(10000)),
+            false
         );
         integratorContract.save();
     }
