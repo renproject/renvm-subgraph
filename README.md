@@ -26,11 +26,19 @@ curl \
 GraphQL query:
 
 ```graphql
-query getRenVMData {
-    renVM(id: "1") {
+{
+    renVM(id: 1) {
+        volume {
+            symbol
+            amountInUsd
+        }
+    }
+    epoches(first: 5, orderBy: timestamp, orderDirection: desc) {
         numberOfDarknodes
-        numberOfDarknodesLastEpoch
-        numberOfDarknodesNextEpoch
+        rewardShares {
+            symbol
+            amountInUsd
+        }
     }
 }
 ```

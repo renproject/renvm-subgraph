@@ -6,14 +6,18 @@ import {
     DarknodePayment,
     LogDarknodeClaim,
     LogDarknodeWithdrew,
-    WithdrawCall,
+    WithdrawCall
 } from "../generated/DarknodePayment/DarknodePayment";
-import { DarknodeRegistry } from "../generated/DarknodeRegistry/DarknodeRegistry";
 import { RenERC20 } from "../generated/GatewayRegistry/RenERC20";
-import { Epoch } from "../generated/schema";
 import { bch, bchGateway, btc, btcGateway, zec, zecGateway } from "./_config";
 import { setAmount } from "./utils/assetAmount";
-import { getDarknode, getRenVM, one, zero } from "./utils/common";
+import {
+    getDarknode,
+    getRenVM,
+    getTokenSymbol,
+    one,
+    zero
+} from "./utils/common";
 
 export function handleLogDarknodeWithdrew(event: LogDarknodeWithdrew): void {}
 
@@ -47,9 +51,11 @@ export function handleLogDarknodeClaim(event: LogDarknodeClaim): void {
             break;
         } else {
             let token = RenERC20.bind(tokens.value);
-            let symbol = token.try_symbol();
-            if (symbol.reverted) {
-                break;
+            let trySymbol = getTokenSymbol(token);
+            if (trySymbol.reverted) {
+                log.warning(tokens.value.toHexString(), []);
+                i = i.plus(one());
+                continue;
             }
             let balance = darknodePayment.darknodeBalances(
                 Address.fromString(darknodeID.toHexString()),
@@ -59,7 +65,7 @@ export function handleLogDarknodeClaim(event: LogDarknodeClaim): void {
                 darknode.balances,
                 darknode.id,
                 "balances",
-                symbol.value,
+                trySymbol.value,
                 balance
             );
         }

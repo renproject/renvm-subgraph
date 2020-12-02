@@ -1,15 +1,21 @@
-import { BigDecimal, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import {
+    BigDecimal,
+    BigInt,
+    Bytes,
+    ethereum,
+    Address
+} from "@graphprotocol/graph-ts";
+import { RenERC20 } from "../../generated/GatewayRegistry/RenERC20";
 
 import {
     Darknode,
     Integrator,
     IntegratorContract,
-    RenVM,
+    RenVM
 } from "../../generated/schema";
 import { resolveIntegratorID } from "../integrators";
 
 // @ts-ignore - typescript doesn't like i32
-
 export type I32 = i32;
 
 export const zero = (): BigInt => {
@@ -26,6 +32,28 @@ export const one = (): BigInt => {
 
 export const oneDot = (): BigDecimal => {
     return BigInt.fromI32(1).toBigDecimal();
+};
+
+let ethAddress = Address.fromString(
+    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+);
+let mainnetSai = Address.fromString(
+    "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359"
+);
+
+export const getTokenSymbol = (
+    token: RenERC20
+): ethereum.CallResult<string> => {
+    if (token._address.equals(ethAddress)) {
+        return ethereum.CallResult.fromValue("ETH");
+    }
+
+    // Returns bytes32 instead of string
+    if (token._address.equals(mainnetSai)) {
+        return ethereum.CallResult.fromValue("SAI");
+    }
+
+    return token.try_symbol();
 };
 
 export const getIntegrator = (contractAddress: Bytes): Integrator => {

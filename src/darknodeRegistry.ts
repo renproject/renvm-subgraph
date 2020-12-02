@@ -1,6 +1,6 @@
 // tslint:disable: only-arrow-functions prefer-for-of
 
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 
 import { Gateway } from "../generated/BTCGateway/Gateway";
 import { DarknodePayment } from "../generated/DarknodePayment/DarknodePayment";
@@ -9,13 +9,19 @@ import {
     LogDarknodeDeregistered,
     LogDarknodeRefunded,
     LogDarknodeRegistered,
-    LogNewEpoch,
+    LogNewEpoch
 } from "../generated/DarknodeRegistry/DarknodeRegistry";
 import { RenERC20 } from "../generated/GatewayRegistry/RenERC20";
 import { Epoch } from "../generated/schema";
 import { bchGateway, btcGateway, zecGateway } from "./_config";
 import { setAmount } from "./utils/assetAmount";
-import { getDarknode, getRenVM, one, zero } from "./utils/common";
+import {
+    getDarknode,
+    getRenVM,
+    getTokenSymbol,
+    one,
+    zero
+} from "./utils/common";
 
 export function handleLogDarknodeRegistered(
     event: LogDarknodeRegistered
@@ -153,9 +159,11 @@ export function handleLogNewEpoch(event: LogNewEpoch): void {
             break;
         } else {
             let token = RenERC20.bind(tokens.value);
-            let symbol = token.try_symbol();
-            if (symbol.reverted) {
-                break;
+            let trySymbol = getTokenSymbol(token);
+            if (trySymbol.reverted) {
+                log.warning(tokens.value.toHexString(), []);
+                i = i.plus(one());
+                continue;
             }
 
             let tryRewardShare = darknodePayment.try_previousCycleRewardShare(
@@ -168,7 +176,7 @@ export function handleLogNewEpoch(event: LogNewEpoch): void {
                 epoch.rewardShares,
                 epoch.id,
                 "rewardShares",
-                symbol.value,
+                trySymbol.value,
                 rewardShare
             );
             let cumulativeRewardShare =
@@ -181,7 +189,7 @@ export function handleLogNewEpoch(event: LogNewEpoch): void {
                 epoch.cumulativeRewardShares,
                 epoch.id,
                 "cumulativeRewardShares",
-                symbol.value,
+                trySymbol.value,
                 cumulativeRewardShare
             );
         }
