@@ -159,6 +159,11 @@ type Integrator @entity {
     volume: [AssetAmount!]!
     fees: [AssetAmount!]!
 
+    # Track totals so that entities can be sorted by them.
+    txCountTotal: BigInt!
+    volumeTotalUSD: BigDecimal!
+    feesTotalUSD: BigDecimal!
+
     # DEPRECATED
 
     txCountBTC: BigInt!

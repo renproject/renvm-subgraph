@@ -4,6 +4,27 @@ import { Asset, AssetAmount } from "../../generated/schema";
 import { zero, zeroDot } from "./common";
 import { exponent, getPriceInEth, getPriceInUsd } from "./uniswapPrices";
 
+export const getAmountInUsd = (
+    itemID: string,
+    field: string,
+    symbol: string
+): BigDecimal => {
+    let id = itemID + "_" + field + "_" + symbol;
+
+    let assetAmount = AssetAmount.load(id);
+    if (assetAmount == null) {
+        assetAmount = new AssetAmount(id);
+        assetAmount.symbol = symbol;
+        assetAmount.amount = zero();
+        assetAmount.amountInEth = zeroDot();
+        assetAmount.amountInUsd = zeroDot();
+    }
+    assetAmount.asset = symbol;
+    assetAmount.save();
+
+    return assetAmount.amountInUsd;
+};
+
 const updateAmount = (
     array: string[],
     itemID: string,

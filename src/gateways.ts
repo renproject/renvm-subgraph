@@ -9,7 +9,7 @@ import {
 } from "../generated/GatewayRegistry/Gateway";
 import { RenERC20 } from "../generated/GatewayRegistry/RenERC20";
 import { Transaction } from "../generated/schema";
-import { addAmount, subAmount } from "./utils/assetAmount";
+import { addAmount, getAmountInUsd, subAmount } from "./utils/assetAmount";
 import {
     getIntegrator,
     getIntegratorContract,
@@ -34,7 +34,7 @@ export function handleMint(call: MintCall): void {
     tx.transactionTo = call.transaction.to;
     tx.integrator = call.from;
     if (call.transaction.to.equals(gateway._address)) {
-        tx.integrator = Bytes.fromUTF8("direct");
+        tx.integrator = Bytes.fromUTF8("direct") as Bytes;
     }
     tx.save();
 
@@ -85,6 +85,8 @@ export function handleMint(call: MintCall): void {
 
     if (tx.integrator !== null) {
         let integrator = getIntegrator(tx.integrator as Bytes);
+
+        // TxCount
         integrator.txCount = addValue(
             integrator.txCount,
             integrator.id,
@@ -92,6 +94,9 @@ export function handleMint(call: MintCall): void {
             symbol,
             one()
         );
+        integrator.txCountTotal = integrator.txCountTotal.plus(one());
+
+        // Locked
         integrator.locked = addAmount(
             integrator.locked,
             integrator.id,
@@ -100,6 +105,9 @@ export function handleMint(call: MintCall): void {
             tx.amount,
             true
         );
+
+        // Volume
+        let volumeBefore = getAmountInUsd(integrator.id, "volume", symbol);
         integrator.volume = addAmount(
             integrator.volume,
             integrator.id,
@@ -108,6 +116,14 @@ export function handleMint(call: MintCall): void {
             tx.amount,
             false
         );
+        let volumeAfter = getAmountInUsd(integrator.id, "volume", symbol);
+        // Add difference of volumeAfter and volumeBefore.
+        integrator.volumeTotalUSD = integrator.volumeTotalUSD
+            .plus(volumeAfter)
+            .minus(volumeBefore);
+
+        // Fees
+        let feesBefore = getAmountInUsd(integrator.id, "fees", symbol);
         integrator.fees = addAmount(
             integrator.fees,
             integrator.id,
@@ -118,6 +134,12 @@ export function handleMint(call: MintCall): void {
                 .div(BigInt.fromI32(10000)),
             false
         );
+        let feesAfter = getAmountInUsd(integrator.id, "fees", symbol);
+        // Add difference of feesAfter and feesBefore.
+        integrator.feesTotalUSD = integrator.feesTotalUSD
+            .plus(feesAfter)
+            .minus(feesBefore);
+
         integrator.save();
 
         let integratorContract = getIntegratorContract(tx.integrator as Bytes);
@@ -179,7 +201,7 @@ export function handleBurn(call: BurnCall): void {
     tx.type = "burn";
     tx.integrator = call.from;
     if (call.transaction.to.equals(gateway._address)) {
-        tx.integrator = Bytes.fromUTF8("direct");
+        tx.integrator = Bytes.fromUTF8("direct") as Bytes;
     }
     tx.transactionTo = call.transaction.to;
     tx.burnRecipient = call.inputs._to;
@@ -234,7 +256,11 @@ export function handleBurn(call: BurnCall): void {
     );
     renVM.save();
 
+    // Integrator
+
     let integrator = getIntegrator(tx.integrator as Bytes);
+
+    // TxCount
     integrator.txCount = addValue(
         integrator.txCount,
         integrator.id,
@@ -242,6 +268,9 @@ export function handleBurn(call: BurnCall): void {
         symbol,
         one()
     );
+    integrator.txCountTotal = integrator.txCountTotal.plus(one());
+
+    // Locked
     integrator.locked = subAmount(
         integrator.locked,
         integrator.id,
@@ -254,6 +283,9 @@ export function handleBurn(call: BurnCall): void {
         ),
         true
     );
+
+    // Volume
+    let volumeBefore = getAmountInUsd(integrator.id, "volume", symbol);
     integrator.volume = addAmount(
         integrator.volume,
         integrator.id,
@@ -262,6 +294,14 @@ export function handleBurn(call: BurnCall): void {
         tx.amount,
         false
     );
+    let volumeAfter = getAmountInUsd(integrator.id, "volume", symbol);
+    // Add difference of volumeAfter and volumeBefore.
+    integrator.volumeTotalUSD = integrator.volumeTotalUSD
+        .plus(volumeAfter)
+        .minus(volumeBefore);
+
+    // Fees
+    let feesBefore = getAmountInUsd(integrator.id, "fees", symbol);
     integrator.fees = addAmount(
         integrator.fees,
         integrator.id,
@@ -272,9 +312,19 @@ export function handleBurn(call: BurnCall): void {
             .div(BigInt.fromI32(10000)),
         false
     );
+    let feesAfter = getAmountInUsd(integrator.id, "fees", symbol);
+    // Add difference of feesAfter and feesBefore.
+    integrator.feesTotalUSD = integrator.feesTotalUSD
+        .plus(feesAfter)
+        .minus(feesBefore);
+
     integrator.save();
 
+    // Integrator contract
+
     let integratorContract = getIntegratorContract(tx.integrator as Bytes);
+
+    // TxCount
     integratorContract.txCount = addValue(
         integratorContract.txCount,
         integratorContract.id,
@@ -282,6 +332,8 @@ export function handleBurn(call: BurnCall): void {
         symbol,
         one()
     );
+
+    // Locked
     integratorContract.locked = subAmount(
         integratorContract.locked,
         integratorContract.id,
@@ -294,6 +346,8 @@ export function handleBurn(call: BurnCall): void {
         ),
         true
     );
+
+    // Volume
     integratorContract.volume = addAmount(
         integratorContract.volume,
         integratorContract.id,
@@ -302,6 +356,8 @@ export function handleBurn(call: BurnCall): void {
         tx.amount,
         false
     );
+
+    // Fees
     integratorContract.fees = addAmount(
         integratorContract.fees,
         integratorContract.id,
