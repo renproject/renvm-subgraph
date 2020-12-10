@@ -18,17 +18,16 @@ const updateAmount = (
     let id = itemID + "_" + field + "_" + symbol;
 
     let asset = Asset.load(symbol);
-    let assetSymbol: string | null = asset === null ? null : asset.symbol;
 
     let assetAmount = AssetAmount.load(id);
     if (assetAmount == null) {
         assetAmount = new AssetAmount(id);
         assetAmount.symbol = symbol;
-        assetAmount.asset = assetSymbol;
         assetAmount.amount = zero();
         assetAmount.amountInEth = zeroDot();
         assetAmount.amountInUsd = zeroDot();
     }
+    assetAmount.asset = symbol;
 
     let assetPriceInEth = asset
         ? getPriceInEth(Address.fromString(asset.tokenAddress))

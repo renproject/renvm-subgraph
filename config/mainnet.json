@@ -11,7 +11,7 @@
     "weth": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
     "usd": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
 
-    "_comment": "DEPRECATED",
+    "_comment": "// DEPRECATED //",
     "btcGateway": "0xe4b679400F0f267212D5D812B95f58C83243EE71",
     "zecGateway": "0xc3BbD5aDb611dd74eCa6123F05B18acc886e122D",
     "bchGateway": "0xCc4FF5b8A4A7adb35F00ff0CBf53784e07c3C52F",

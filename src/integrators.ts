@@ -51,5 +51,5 @@ export const resolveIntegratorID = (address: Bytes): string => {
     if (addressHex == "0x3973b2acdfac17171315e49ef19a0758b8b6f104")
         return "curve";
 
-    return addressHex;
+    return "integrator-" + addressHex;
 };

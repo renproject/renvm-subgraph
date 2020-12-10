@@ -5,7 +5,7 @@ import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 import {
     BurnCall,
     Gateway,
-    MintCall,
+    MintCall
 } from "../generated/GatewayRegistry/Gateway";
 import { RenERC20 } from "../generated/GatewayRegistry/RenERC20";
 import { Transaction } from "../generated/schema";
@@ -14,7 +14,7 @@ import {
     getIntegrator,
     getIntegratorContract,
     getRenVM,
-    one,
+    one
 } from "./utils/common";
 import { addValue, setValue } from "./utils/valueWithAsset";
 
@@ -33,6 +33,9 @@ export function handleMint(call: MintCall): void {
     tx.type = "mint";
     tx.transactionTo = call.transaction.to;
     tx.integrator = call.from;
+    if (call.transaction.to.equals(gateway._address)) {
+        tx.integrator = Bytes.fromUTF8("direct");
+    }
     tx.save();
 
     // Update Global Values
@@ -80,82 +83,78 @@ export function handleMint(call: MintCall): void {
     );
     renVM.save();
 
-    if (!call.transaction.to.equals(gateway._address)) {
-        if (tx.integrator !== null) {
-            let integrator = getIntegrator(tx.integrator as Bytes);
-            integrator.txCount = addValue(
-                integrator.txCount,
-                integrator.id,
-                "txCount",
-                symbol,
-                one()
-            );
-            integrator.locked = addAmount(
-                integrator.locked,
-                integrator.id,
-                "locked",
-                symbol,
-                tx.amount,
-                true
-            );
-            integrator.volume = addAmount(
-                integrator.volume,
-                integrator.id,
-                "volume",
-                symbol,
-                tx.amount,
-                false
-            );
-            integrator.fees = addAmount(
-                integrator.fees,
-                integrator.id,
-                "fees",
-                symbol,
-                tx.amount
-                    .times(BigInt.fromI32(gateway.mintFee()))
-                    .div(BigInt.fromI32(10000)),
-                false
-            );
-            integrator.save();
+    if (tx.integrator !== null) {
+        let integrator = getIntegrator(tx.integrator as Bytes);
+        integrator.txCount = addValue(
+            integrator.txCount,
+            integrator.id,
+            "txCount",
+            symbol,
+            one()
+        );
+        integrator.locked = addAmount(
+            integrator.locked,
+            integrator.id,
+            "locked",
+            symbol,
+            tx.amount,
+            true
+        );
+        integrator.volume = addAmount(
+            integrator.volume,
+            integrator.id,
+            "volume",
+            symbol,
+            tx.amount,
+            false
+        );
+        integrator.fees = addAmount(
+            integrator.fees,
+            integrator.id,
+            "fees",
+            symbol,
+            tx.amount
+                .times(BigInt.fromI32(gateway.mintFee()))
+                .div(BigInt.fromI32(10000)),
+            false
+        );
+        integrator.save();
 
-            let integratorContract = getIntegratorContract(
-                tx.integrator as Bytes
-            );
-            integratorContract.txCount = addValue(
-                integratorContract.txCount,
-                integratorContract.id,
-                "txCount",
-                symbol,
-                one()
-            );
-            integratorContract.locked = addAmount(
-                integratorContract.locked,
-                integratorContract.id,
-                "locked",
-                symbol,
-                tx.amount,
-                true
-            );
-            integratorContract.volume = addAmount(
-                integratorContract.volume,
-                integratorContract.id,
-                "volume",
-                symbol,
-                tx.amount,
-                false
-            );
-            integratorContract.fees = addAmount(
-                integratorContract.fees,
-                integratorContract.id,
-                "fees",
-                symbol,
-                tx.amount
-                    .times(BigInt.fromI32(gateway.mintFee()))
-                    .div(BigInt.fromI32(10000)),
-                false
-            );
-            integratorContract.save();
-        }
+        let integratorContract = getIntegratorContract(tx.integrator as Bytes);
+        integratorContract.txCount = addValue(
+            integratorContract.txCount,
+            integratorContract.id,
+            "txCount",
+            symbol,
+            one()
+        );
+        integratorContract.locked = addAmount(
+            integratorContract.locked,
+            integratorContract.id,
+            "locked",
+            symbol,
+            tx.amount,
+            true
+        );
+        integratorContract.volume = addAmount(
+            integratorContract.volume,
+            integratorContract.id,
+            "volume",
+            symbol,
+            tx.amount,
+            false
+        );
+        integratorContract.fees = addAmount(
+            integratorContract.fees,
+            integratorContract.id,
+            "fees",
+            symbol,
+            tx.amount
+                .times(BigInt.fromI32(gateway.mintFee()))
+                .div(BigInt.fromI32(10000)),
+            false
+        );
+        integratorContract.save();
     }
 }
 
@@ -179,6 +178,9 @@ export function handleBurn(call: BurnCall): void {
     tx.feeRate = BigInt.fromI32(gateway.burnFee());
     tx.type = "burn";
     tx.integrator = call.from;
+    if (call.transaction.to.equals(gateway._address)) {
+        tx.integrator = Bytes.fromUTF8("direct");
+    }
     tx.transactionTo = call.transaction.to;
     tx.burnRecipient = call.inputs._to;
     tx.save();
@@ -232,86 +234,83 @@ export function handleBurn(call: BurnCall): void {
     );
     renVM.save();
 
-    // Check that the burn hasn't been submitted directly by an account
-    if (!call.transaction.to.equals(gateway._address)) {
-        let integrator = getIntegrator(tx.integrator as Bytes);
-        integrator.txCount = addValue(
-            integrator.txCount,
-            integrator.id,
-            "txCount",
-            symbol,
-            one()
-        );
-        integrator.locked = subAmount(
-            integrator.locked,
-            integrator.id,
-            "locked",
-            symbol,
-            tx.amount.minus(
-                tx.amount
-                    .times(BigInt.fromI32(gateway.burnFee()))
-                    .div(BigInt.fromI32(10000))
-            ),
-            true
-        );
-        integrator.volume = addAmount(
-            integrator.volume,
-            integrator.id,
-            "volume",
-            symbol,
-            tx.amount,
-            false
-        );
-        integrator.fees = addAmount(
-            integrator.fees,
-            integrator.id,
-            "fees",
-            symbol,
+    let integrator = getIntegrator(tx.integrator as Bytes);
+    integrator.txCount = addValue(
+        integrator.txCount,
+        integrator.id,
+        "txCount",
+        symbol,
+        one()
+    );
+    integrator.locked = subAmount(
+        integrator.locked,
+        integrator.id,
+        "locked",
+        symbol,
+        tx.amount.minus(
             tx.amount
                 .times(BigInt.fromI32(gateway.burnFee()))
-                .div(BigInt.fromI32(10000)),
-            false
-        );
-        integrator.save();
+                .div(BigInt.fromI32(10000))
+        ),
+        true
+    );
+    integrator.volume = addAmount(
+        integrator.volume,
+        integrator.id,
+        "volume",
+        symbol,
+        tx.amount,
+        false
+    );
+    integrator.fees = addAmount(
+        integrator.fees,
+        integrator.id,
+        "fees",
+        symbol,
+        tx.amount
+            .times(BigInt.fromI32(gateway.burnFee()))
+            .div(BigInt.fromI32(10000)),
+        false
+    );
+    integrator.save();
 
-        let integratorContract = getIntegratorContract(tx.integrator as Bytes);
-        integratorContract.txCount = addValue(
-            integratorContract.txCount,
-            integratorContract.id,
-            "txCount",
-            symbol,
-            one()
-        );
-        integratorContract.locked = subAmount(
-            integratorContract.locked,
-            integratorContract.id,
-            "locked",
-            symbol,
-            tx.amount.minus(
-                tx.amount
-                    .times(BigInt.fromI32(gateway.burnFee()))
-                    .div(BigInt.fromI32(10000))
-            ),
-            true
-        );
-        integratorContract.volume = addAmount(
-            integratorContract.volume,
-            integratorContract.id,
-            "volume",
-            symbol,
-            tx.amount,
-            false
-        );
-        integratorContract.fees = addAmount(
-            integratorContract.fees,
-            integratorContract.id,
-            "fees",
-            symbol,
+    let integratorContract = getIntegratorContract(tx.integrator as Bytes);
+    integratorContract.txCount = addValue(
+        integratorContract.txCount,
+        integratorContract.id,
+        "txCount",
+        symbol,
+        one()
+    );
+    integratorContract.locked = subAmount(
+        integratorContract.locked,
+        integratorContract.id,
+        "locked",
+        symbol,
+        tx.amount.minus(
             tx.amount
                 .times(BigInt.fromI32(gateway.burnFee()))
-                .div(BigInt.fromI32(10000)),
-            false
-        );
-        integratorContract.save();
-    }
+                .div(BigInt.fromI32(10000))
+        ),
+        true
+    );
+    integratorContract.volume = addAmount(
+        integratorContract.volume,
+        integratorContract.id,
+        "volume",
+        symbol,
+        tx.amount,
+        false
+    );
+    integratorContract.fees = addAmount(
+        integratorContract.fees,
+        integratorContract.id,
+        "fees",
+        symbol,
+        tx.amount
+            .times(BigInt.fromI32(gateway.burnFee()))
+            .div(BigInt.fromI32(10000)),
+        false
+    );
+    integratorContract.save();
 }
