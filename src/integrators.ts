@@ -39,9 +39,9 @@ export const resolveIntegratorID = (address: Bytes): string => {
         return "RenEscrow";
     if (addressHex == "0x493d490d84053fed122035d8889d88a9c492f7fa")
         return "RenEscrow";
-    if (addressHex == "0x8fe7e17d20af82258e3ad798ef781add8c060dbf")
-        return "RenEscrow";
     if (addressHex == "0x15632dcfba89c33f9bc0ffed0380b1319be57223")
+        return "RenEscrow";
+    if (addressHex == "0x8fe7e17d20af82258e3ad798ef781add8c060dbf")
         return "RenEscrow";
 
     // Testnet

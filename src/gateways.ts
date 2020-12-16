@@ -6,8 +6,9 @@ import {
     BurnCall,
     Gateway,
     MintCall
-} from "../generated/GatewayRegistry/Gateway";
-import { RenERC20 } from "../generated/GatewayRegistry/RenERC20";
+} from "../generated/templates/Gateway/Gateway";
+import { RenERC20 } from "../generated/templates/Gateway/RenERC20";
+import { DarknodePayment } from "../generated/templates/Gateway/DarknodePayment";
 import { Transaction } from "../generated/schema";
 import { addAmount, getAmountInUsd, subAmount } from "./utils/assetAmount";
 import {
@@ -81,6 +82,22 @@ export function handleMint(call: MintCall): void {
         symbol,
         BigInt.fromI32(gateway.burnFee())
     );
+
+    let feeRecipient = gateway.feeRecipient();
+    let darknodePayment = DarknodePayment.bind(feeRecipient);
+    let try_rewardPool = darknodePayment.try_currentCycleRewardPool(
+        token._address
+    );
+    if (!try_rewardPool.reverted) {
+        renVM.cycleFees = setValue(
+            renVM.cycleFees,
+            renVM.id,
+            "cycleFees",
+            symbol,
+            try_rewardPool.value
+        );
+    }
+
     renVM.save();
 
     if (tx.integrator !== null) {
@@ -254,6 +271,22 @@ export function handleBurn(call: BurnCall): void {
         symbol,
         BigInt.fromI32(gateway.burnFee())
     );
+
+    let feeRecipient = gateway.feeRecipient();
+    let darknodePayment = DarknodePayment.bind(feeRecipient);
+    let try_rewardPool = darknodePayment.try_currentCycleRewardPool(
+        token._address
+    );
+    if (!try_rewardPool.reverted) {
+        renVM.cycleFees = setValue(
+            renVM.cycleFees,
+            renVM.id,
+            "cycleFees",
+            symbol,
+            try_rewardPool.value
+        );
+    }
+
     renVM.save();
 
     // Integrator

@@ -22,6 +22,7 @@ import {
     one,
     zero
 } from "./utils/common";
+import { setValue } from "./utils/valueWithAsset";
 
 export function handleLogDarknodeRegistered(
     event: LogDarknodeRegistered
@@ -122,8 +123,6 @@ export function handleLogNewEpoch(event: LogNewEpoch): void {
     renVM.currentEpoch = epochID;
     renVM.deregistrationInterval = registry.deregistrationInterval();
 
-    renVM.save();
-
     let btcShare = !BTCGateway.try_minimumBurnAmount().reverted
         ? darknodePayment.previousCycleRewardShare(BTCGateway.token())
         : zero();
@@ -192,9 +191,23 @@ export function handleLogNewEpoch(event: LogNewEpoch): void {
                 trySymbol.value,
                 cumulativeRewardShare
             );
+
+            let try_rewardPool = darknodePayment.try_currentCycleRewardPool(
+                token._address
+            );
+            if (!try_rewardPool.reverted) {
+                renVM.cycleFees = setValue(
+                    renVM.cycleFees,
+                    renVM.id,
+                    "cycleFees",
+                    trySymbol.value,
+                    try_rewardPool.value
+                );
+            }
         }
         i = i.plus(one());
     }
 
     epoch.save();
+    renVM.save();
 }

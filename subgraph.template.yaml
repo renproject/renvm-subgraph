@@ -220,6 +220,8 @@ templates:
                 file: ./abis/UniswapFactory.json
               - name: UniswapExchange
                 file: ./abis/UniswapExchange.json
+              - name: DarknodePayment
+                file: ./abis/DarknodePayment.json
           callHandlers:
               - function: mint(bytes32,uint256,bytes32,bytes)
                 handler: handleMint

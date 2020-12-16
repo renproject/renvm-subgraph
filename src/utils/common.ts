@@ -81,6 +81,10 @@ export const getIntegrator = (contractAddress: Bytes): Integrator => {
         integrator.volume = [];
         integrator.fees = [];
 
+        integrator.txCountTotal = zero();
+        integrator.volumeTotalUSD = zeroDot();
+        integrator.feesTotalUSD = zeroDot();
+
         integrator.date = date;
     }
 
@@ -183,6 +187,7 @@ export const getRenVM = (updateAtBlock: ethereum.Block): RenVM => {
         renVM.locked = [];
         renVM.volume = [];
         renVM.fees = [];
+        renVM.cycleFees = [];
 
         renVM.save();
     }
