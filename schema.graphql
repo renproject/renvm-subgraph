@@ -101,6 +101,8 @@ type RenVM @entity {
     numberOfDarknodes: BigInt!
     numberOfDarknodesLastEpoch: BigInt!
     numberOfDarknodesNextEpoch: BigInt!
+    pendingRegistrations: BigInt!
+    pendingDeregistrations: BigInt!
 
     minimumBond: BigInt!
 

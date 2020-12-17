@@ -152,6 +152,8 @@ export const getRenVM = (updateAtBlock: ethereum.Block): RenVM => {
         renVM.numberOfDarknodes = zero();
         renVM.numberOfDarknodesLastEpoch = zero();
         renVM.numberOfDarknodesNextEpoch = zero();
+        renVM.pendingRegistrations = zero();
+        renVM.pendingDeregistrations = zero();
 
         renVM.minimumBond = zero();
         renVM.minimumEpochInterval = zero();
