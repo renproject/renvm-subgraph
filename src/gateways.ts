@@ -9,6 +9,7 @@ import {
 } from "../generated/templates/Gateway/Gateway";
 import { RenERC20 } from "../generated/templates/Gateway/RenERC20";
 import { DarknodePayment } from "../generated/templates/Gateway/DarknodePayment";
+import { DarknodePaymentStore } from "../generated/templates/Gateway/DarknodePaymentStore";
 import { Transaction } from "../generated/schema";
 import { addAmount, getAmountInUsd, subAmount } from "./utils/assetAmount";
 import {
@@ -84,18 +85,22 @@ export function handleMint(call: MintCall): void {
     );
 
     let feeRecipient = gateway.feeRecipient();
-    let darknodePayment = DarknodePayment.bind(feeRecipient);
-    let try_rewardPool = darknodePayment.try_currentCycleRewardPool(
-        token._address
-    );
-    if (!try_rewardPool.reverted) {
-        renVM.cycleFees = setValue(
-            renVM.cycleFees,
-            renVM.id,
-            "cycleFees",
-            symbol,
-            try_rewardPool.value
+    let darknodePaymentStore = DarknodePaymentStore.bind(feeRecipient);
+    let try_storeOwner = darknodePaymentStore.try_owner();
+    if (!try_storeOwner.reverted) {
+        let darknodePayment = DarknodePayment.bind(try_storeOwner.value);
+        let try_rewardPool = darknodePayment.try_currentCycleRewardPool(
+            token._address
         );
+        if (!try_rewardPool.reverted) {
+            renVM.cycleFees = setValue(
+                renVM.cycleFees,
+                renVM.id,
+                "cycleFees",
+                symbol,
+                try_rewardPool.value
+            );
+        }
     }
 
     renVM.save();
@@ -273,18 +278,22 @@ export function handleBurn(call: BurnCall): void {
     );
 
     let feeRecipient = gateway.feeRecipient();
-    let darknodePayment = DarknodePayment.bind(feeRecipient);
-    let try_rewardPool = darknodePayment.try_currentCycleRewardPool(
-        token._address
-    );
-    if (!try_rewardPool.reverted) {
-        renVM.cycleFees = setValue(
-            renVM.cycleFees,
-            renVM.id,
-            "cycleFees",
-            symbol,
-            try_rewardPool.value
+    let darknodePaymentStore = DarknodePaymentStore.bind(feeRecipient);
+    let try_storeOwner = darknodePaymentStore.try_owner();
+    if (!try_storeOwner.reverted) {
+        let darknodePayment = DarknodePayment.bind(try_storeOwner.value);
+        let try_rewardPool = darknodePayment.try_currentCycleRewardPool(
+            token._address
         );
+        if (!try_rewardPool.reverted) {
+            renVM.cycleFees = setValue(
+                renVM.cycleFees,
+                renVM.id,
+                "cycleFees",
+                symbol,
+                try_rewardPool.value
+            );
+        }
     }
 
     renVM.save();
