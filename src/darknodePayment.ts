@@ -5,8 +5,7 @@ import {
     ChangeCycleCall,
     DarknodePayment,
     LogDarknodeClaim,
-    LogDarknodeWithdrew,
-    WithdrawCall
+    LogDarknodeWithdrew
 } from "../generated/DarknodePayment/DarknodePayment";
 import { RenERC20 } from "../generated/GatewayRegistry/RenERC20";
 import { bch, bchGateway, btc, btcGateway, zec, zecGateway } from "./_config";
@@ -18,8 +17,6 @@ import {
     one,
     zero
 } from "./utils/common";
-
-export function handleLogDarknodeWithdrew(event: LogDarknodeWithdrew): void {}
 
 export function handleLogDarknodeClaim(event: LogDarknodeClaim): void {
     let BTCGateway = Gateway.bind(Address.fromString(btcGateway.slice(2)));
@@ -75,14 +72,14 @@ export function handleLogDarknodeClaim(event: LogDarknodeClaim): void {
     darknode.save();
 }
 
-export function handleWithdraw(call: WithdrawCall): void {
-    let darknodePayment = DarknodePayment.bind(call.to);
+export function handleLogDarknodeWithdrew(event: LogDarknodeWithdrew): void {
+    let darknodePayment = DarknodePayment.bind(event.address);
 
     let btcToken = Address.fromString(btc.slice(2));
     let zecToken = Address.fromString(zec.slice(2));
     let bchToken = Address.fromString(bch.slice(2));
 
-    let darknodeID = call.inputs._darknode;
+    let darknodeID = event.params._darknodeID;
 
     let darknode = getDarknode(darknodeID);
 
@@ -101,7 +98,7 @@ export function handleWithdraw(call: WithdrawCall): void {
         bchToken
     );
 
-    let token = RenERC20.bind(call.inputs._token);
+    let token = RenERC20.bind(event.params._token);
     let symbol = token.symbol();
     let balance = darknodePayment.darknodeBalances(
         Address.fromString(darknodeID.toHexString()),
@@ -118,7 +115,7 @@ export function handleWithdraw(call: WithdrawCall): void {
     darknode.save();
 
     // Update RenVM's updated block.
-    getRenVM(call.block);
+    getRenVM(event.block);
 }
 
 export function handleChangeCycle(call: ChangeCycleCall): void {

@@ -190,8 +190,6 @@ dataSources:
           callHandlers:
               - function: changeCycle()
                 handler: handleChangeCycle
-              - function: withdraw(address,address)
-                handler: handleWithdraw
           eventHandlers:
               - event: LogDarknodeClaim(indexed address,uint256)
                 handler: handleLogDarknodeClaim

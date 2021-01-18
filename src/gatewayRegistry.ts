@@ -66,6 +66,13 @@ export function handleLogGatewayRegistered(event: LogGatewayRegistered): void {
             symbol,
             BigInt.fromI32(gateway.burnFee())
         );
+        renVM.cycleRewards = setAmount(
+            renVM.cycleRewards,
+            renVM.id,
+            "cycleRewards",
+            symbol,
+            zero()
+        );
     }
 
     asset.gatewayAddress = token.owner().toHexString();

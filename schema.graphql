@@ -133,7 +133,7 @@ type RenVM @entity {
     locked: [AssetAmount!]!
     volume: [AssetAmount!]!
     fees: [AssetAmount!]!
-    cycleFees: [AssetAmount!]!
+    cycleRewards: [AssetAmount!]!
 
     # DEPRECATED
 

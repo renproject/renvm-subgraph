@@ -154,6 +154,9 @@ export function handleLogNewEpoch(event: LogNewEpoch): void {
             ? epoch.rewardShareBCH.plus(previousEpoch.totalRewardShareBCH)
             : epoch.rewardShareBCH;
 
+    // Reset rewards so that any deregistered tokens get removed.
+    renVM.cycleRewards = [];
+
     // Loop through registered tokens, storing cycle rewards.
     let i = zero();
     while (true) {
@@ -200,10 +203,10 @@ export function handleLogNewEpoch(event: LogNewEpoch): void {
                 token._address
             );
             if (!try_rewardPool.reverted) {
-                renVM.cycleFees = setValue(
-                    renVM.cycleFees,
+                renVM.cycleRewards = setAmount(
+                    renVM.cycleRewards,
                     renVM.id,
-                    "cycleFees",
+                    "cycleRewards",
                     trySymbol.value,
                     try_rewardPool.value
                 );

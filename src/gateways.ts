@@ -11,7 +11,12 @@ import { RenERC20 } from "../generated/templates/Gateway/RenERC20";
 import { DarknodePayment } from "../generated/templates/Gateway/DarknodePayment";
 import { DarknodePaymentStore } from "../generated/templates/Gateway/DarknodePaymentStore";
 import { Transaction } from "../generated/schema";
-import { addAmount, getAmountInUsd, subAmount } from "./utils/assetAmount";
+import {
+    addAmount,
+    getAmountInUsd,
+    setAmount,
+    subAmount
+} from "./utils/assetAmount";
 import {
     getIntegrator,
     getIntegratorContract,
@@ -84,6 +89,8 @@ export function handleMint(call: MintCall): void {
         BigInt.fromI32(gateway.burnFee())
     );
 
+    renVM.save();
+
     let feeRecipient = gateway.feeRecipient();
     let darknodePaymentStore = DarknodePaymentStore.bind(feeRecipient);
     let try_storeOwner = darknodePaymentStore.try_owner();
@@ -93,17 +100,17 @@ export function handleMint(call: MintCall): void {
             token._address
         );
         if (!try_rewardPool.reverted) {
-            renVM.cycleFees = setValue(
-                renVM.cycleFees,
+            renVM.cycleRewards = setAmount(
+                renVM.cycleRewards,
                 renVM.id,
-                "cycleFees",
+                "cycleRewards",
                 symbol,
                 try_rewardPool.value
             );
+
+            renVM.save();
         }
     }
-
-    renVM.save();
 
     if (tx.integrator !== null) {
         let integrator = getIntegrator(tx.integrator as Bytes);
@@ -277,6 +284,8 @@ export function handleBurn(call: BurnCall): void {
         BigInt.fromI32(gateway.burnFee())
     );
 
+    renVM.save();
+
     let feeRecipient = gateway.feeRecipient();
     let darknodePaymentStore = DarknodePaymentStore.bind(feeRecipient);
     let try_storeOwner = darknodePaymentStore.try_owner();
@@ -286,17 +295,17 @@ export function handleBurn(call: BurnCall): void {
             token._address
         );
         if (!try_rewardPool.reverted) {
-            renVM.cycleFees = setValue(
-                renVM.cycleFees,
+            renVM.cycleRewards = setAmount(
+                renVM.cycleRewards,
                 renVM.id,
-                "cycleFees",
+                "cycleRewards",
                 symbol,
                 try_rewardPool.value
             );
+
+            renVM.save();
         }
     }
-
-    renVM.save();
 
     // Integrator
 

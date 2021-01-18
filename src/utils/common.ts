@@ -189,7 +189,7 @@ export const getRenVM = (updateAtBlock: ethereum.Block): RenVM => {
         renVM.locked = [];
         renVM.volume = [];
         renVM.fees = [];
-        renVM.cycleFees = [];
+        renVM.cycleRewards = [];
 
         renVM.save();
     }
