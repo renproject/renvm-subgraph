@@ -10,7 +10,7 @@ import {
 import { RenERC20 } from "../generated/templates/Gateway/RenERC20";
 import { DarknodePayment } from "../generated/templates/Gateway/DarknodePayment";
 import { DarknodePaymentStore } from "../generated/templates/Gateway/DarknodePaymentStore";
-import { Transaction } from "../generated/schema";
+import { Integrator, Transaction } from "../generated/schema";
 import {
     addAmount,
     getAmountInUsd,
@@ -113,7 +113,10 @@ export function handleMint(call: MintCall): void {
     }
 
     if (tx.integrator !== null) {
-        let integrator = getIntegrator(tx.integrator as Bytes);
+        let integrator: Integrator = getIntegrator(
+            tx.integrator as Bytes,
+            symbol
+        );
 
         // TxCount
         integrator.txCount = addValue(
@@ -309,7 +312,7 @@ export function handleBurn(call: BurnCall): void {
 
     // Integrator
 
-    let integrator = getIntegrator(tx.integrator as Bytes);
+    let integrator: Integrator = getIntegrator(tx.integrator as Bytes, symbol);
 
     // TxCount
     integrator.txCount = addValue(

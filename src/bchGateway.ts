@@ -3,12 +3,12 @@
 import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 import { BurnCall, Gateway, MintCall } from "../generated/BCHGateway/Gateway";
-import { Transaction } from "../generated/schema";
+import { Integrator, Transaction } from "../generated/schema";
 import {
     getIntegrator,
     getIntegratorContract,
     getRenVM,
-    one,
+    one
 } from "./utils/common";
 
 export function handleMint(call: MintCall): void {
@@ -37,7 +37,7 @@ export function handleMint(call: MintCall): void {
 
     if (!call.transaction.to.equals(gateway._address)) {
         if (tx.integrator !== null) {
-            let integrator = getIntegrator(tx.integrator as Bytes);
+            let integrator: Integrator = getIntegrator(tx.integrator as Bytes);
             integrator.txCountBCH = integrator.txCountBCH.plus(one());
             integrator.volumeBCH = integrator.volumeBCH.plus(tx.amount);
             integrator.lockedBCH = integrator.lockedBCH.plus(tx.amount);
@@ -93,7 +93,7 @@ export function handleBurn(call: BurnCall): void {
 
     // Check that the burn hasn't been submitted directly by an account
     if (!call.transaction.to.equals(gateway._address)) {
-        let integrator = getIntegrator(tx.integrator as Bytes);
+        let integrator: Integrator = getIntegrator(tx.integrator as Bytes);
         integrator.txCountBCH = integrator.txCountBCH.plus(one());
         integrator.volumeBCH = integrator.volumeBCH.plus(tx.amount);
         integrator.lockedBCH = integrator.lockedBCH.plus(tx.amount);

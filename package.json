@@ -10,7 +10,11 @@
         "deploy:local": "npm run codegen && graph deploy --ipfs http://localhost:5001 --node http://localhost:8020/ renproject/renvm",
         "deploy:mainnet": "NETWORK=mainnet NAME=renproject/renvm npm run deploy-remote",
         "deploy:testnet": "NETWORK=testnet NAME=renproject/renvm-testnet npm run deploy-remote",
-        "deploy:devnet": "NETWORK=devnet NAME=noiach/renvm-devnet npm run deploy-remote"
+        "deploy:devnet": "NETWORK=devnet NAME=noiach/renvm-devnet npm run deploy-remote",
+        "deploy:do-0": "npm run codegen && npm run build && graph deploy --ipfs http://157.230.93.109:5001 --node http://157.230.93.109:8020 ${NAME}",
+        "deploy:bsc": "NETWORK=bsc NAME=renproject/renvm deploy:do-0",
+        "deploy:do-1": "npm run codegen && npm run build && graph deploy --ipfs http://157.230.93.109:5001 --node http://157.230.93.109:8020 ${NAME}",
+        "deploy:bsc-testnet": "NETWORK=bsc-testnet NAME=renproject/renvm-testnet yarn deploy:do-1"
     },
     "dependencies": {
         "@graphprotocol/graph-cli": "^0.19.0",

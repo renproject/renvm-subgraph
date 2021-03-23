@@ -56,10 +56,13 @@ export const getTokenSymbol = (
     return token.try_symbol();
 };
 
-export const getIntegrator = (contractAddress: Bytes): Integrator => {
+export const getIntegrator: (
+    contractAddress: Bytes,
+    token?: string
+) => Integrator = (contractAddress: Bytes, token: string = ""): Integrator => {
     let date: I32 = 0;
 
-    let integratorID: string = resolveIntegratorID(contractAddress);
+    let integratorID: string = resolveIntegratorID(contractAddress, token);
     let integrator: Integrator | null = Integrator.load(integratorID);
 
     if (integrator === null) {
