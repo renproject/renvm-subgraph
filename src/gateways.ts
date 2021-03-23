@@ -5,12 +5,14 @@ import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 import {
     BurnCall,
     Gateway,
+    LogBurn,
+    LogMint,
     MintCall
 } from "../generated/templates/Gateway/Gateway";
 import { RenERC20 } from "../generated/templates/Gateway/RenERC20";
 import { DarknodePayment } from "../generated/templates/Gateway/DarknodePayment";
 import { DarknodePaymentStore } from "../generated/templates/Gateway/DarknodePaymentStore";
-import { Transaction } from "../generated/schema";
+import { Integrator, Transaction } from "../generated/schema";
 import {
     addAmount,
     getAmountInUsd,
@@ -25,28 +27,35 @@ import {
 } from "./utils/common";
 import { addValue, setValue } from "./utils/valueWithAsset";
 
-export function handleMint(call: MintCall): void {
-    let gateway = Gateway.bind(call.to);
+export function handleLogMint(event: LogMint): void {
+    // let gateway = Gateway.bind(call.to);
+    let gateway = Gateway.bind(event.address);
+
     let token = RenERC20.bind(gateway.token());
     let symbol = token.symbol();
 
-    let txid = "mint_" + call.inputs._sig.toHexString();
+    // let txid = "mint_" + call.inputs._sig.toHexString();
+    let txid = event.transaction.hash.toHex() + "-" + event.logIndex.toString();
     let tx = new Transaction(txid);
 
-    tx.timestamp = call.block.timestamp;
+    // tx.timestamp = call.block.timestamp;
+    tx.timestamp = event.block.timestamp;
     tx.asset = symbol;
-    tx.amount = call.inputs._amountUnderlying;
+    // tx.amount = call.inputs._amountUnderlying;
+    tx.amount = event.params._amount;
     tx.feeRate = BigInt.fromI32(gateway.mintFee());
     tx.type = "mint";
-    tx.transactionTo = call.transaction.to;
-    tx.integrator = call.from;
-    if (call.transaction.to.equals(gateway._address)) {
+    // tx.transactionTo = call.transaction.to;
+    tx.transactionTo = event.transaction.to;
+    // tx.integrator = call.from;
+    tx.integrator = event.params._to;
+    if (tx.transactionTo.equals(gateway._address)) {
         tx.integrator = Bytes.fromUTF8("direct") as Bytes;
     }
     tx.save();
 
     // Update Global Values
-    let renVM = getRenVM(call.block);
+    let renVM = getRenVM(event.block);
     renVM.txCount = addValue(renVM.txCount, renVM.id, "txCount", symbol, one());
     renVM.locked = addAmount(
         renVM.locked,
@@ -113,7 +122,10 @@ export function handleMint(call: MintCall): void {
     }
 
     if (tx.integrator !== null) {
-        let integrator = getIntegrator(tx.integrator as Bytes);
+        let integrator: Integrator = getIntegrator(
+            tx.integrator as Bytes,
+            symbol
+        );
 
         // TxCount
         integrator.txCount = addValue(
@@ -209,35 +221,43 @@ export function handleMint(call: MintCall): void {
     }
 }
 
-export function handleBurn(call: BurnCall): void {
-    let gateway = Gateway.bind(call.to);
+export function handleLogBurn(event: LogBurn): void {
+    // let gateway = Gateway.bind(call.to);
+    let gateway = Gateway.bind(event.address);
+
     let token = RenERC20.bind(gateway.token());
     let symbol = token.symbol();
 
-    let txid =
-        "burn_" +
-        gateway.nextN().toString() +
-        "_" +
-        call.inputs._to.toHexString() +
-        "_" +
-        call.inputs._amount.toString();
+    // let txid =
+    //     "burn_" +
+    //     gateway.nextN().toString() +
+    //     "_" +
+    //     call.inputs._to.toHexString() +
+    //     "_" +
+    //     call.inputs._amount.toString();
+    let txid = event.transaction.hash.toHex() + "-" + event.logIndex.toString();
     let tx = new Transaction(txid);
 
-    tx.timestamp = call.block.timestamp;
+    // tx.timestamp = call.block.timestamp;
+    tx.timestamp = event.block.timestamp;
     tx.asset = symbol;
-    tx.amount = call.inputs._amount;
+    // tx.amount = call.inputs._amount;
+    tx.amount = event.params._amount;
     tx.feeRate = BigInt.fromI32(gateway.burnFee());
     tx.type = "burn";
-    tx.integrator = call.from;
-    if (call.transaction.to.equals(gateway._address)) {
+    // tx.integrator = call.from;
+    tx.integrator = event.transaction.from;
+    tx.transactionTo = event.transaction.to;
+    if (tx.transactionTo.equals(gateway._address)) {
         tx.integrator = Bytes.fromUTF8("direct") as Bytes;
     }
-    tx.transactionTo = call.transaction.to;
-    tx.burnRecipient = call.inputs._to;
+    // tx.burnRecipient = call.inputs._to;
+    tx.burnRecipient = event.params._to;
     tx.save();
 
     // Update Global Values
-    let renVM = getRenVM(call.block);
+    // let renVM = getRenVM(call.block);
+    let renVM = getRenVM(event.block);
     renVM.txCount = addValue(renVM.txCount, renVM.id, "txCount", symbol, one());
     renVM.locked = subAmount(
         renVM.locked,
@@ -309,7 +329,7 @@ export function handleBurn(call: BurnCall): void {
 
     // Integrator
 
-    let integrator = getIntegrator(tx.integrator as Bytes);
+    let integrator: Integrator = getIntegrator(tx.integrator as Bytes, symbol);
 
     // TxCount
     integrator.txCount = addValue(

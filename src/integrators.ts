@@ -1,6 +1,6 @@
 import { Bytes } from "@graphprotocol/graph-ts";
 
-export const resolveIntegratorID = (address: Bytes): string => {
+export const resolveIntegratorID = (address: Bytes, token: string): string => {
     let addressHex = address.toHexString();
     // @dev Use "==" instead of "===", which compares string references, not values.
 
@@ -43,6 +43,14 @@ export const resolveIntegratorID = (address: Bytes): string => {
         return "RenEscrow";
     if (addressHex == "0x8fe7e17d20af82258e3ad798ef781add8c060dbf")
         return "RenEscrow";
+
+    if (
+        addressHex == "0xae65b0f676313fd715f29d07538d1dc8557f2b1a" ||
+        addressHex == Bytes.fromUTF8("direct").toHexString()
+    ) {
+        if (token == "renFIL") return "DefiBridge";
+        if (token == "renDOGE") return "OpenDAO";
+    }
 
     // Testnet
 
