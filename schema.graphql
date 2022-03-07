@@ -207,3 +207,16 @@ type IntegratorContract @entity {
     lockedBCH: BigInt!
     volumeBCH: BigInt!
 }
+
+type EndUser @entity {
+    id: ID!
+    firstSeen: Int!
+    address: Bytes!
+
+    txCount: [ValueWithAsset!]!
+    volume: [AssetAmount!]!
+
+    # Track totals so that entities can be sorted by them.
+    txCountTotal: BigInt!
+    volumeTotalUSD: BigDecimal!
+}

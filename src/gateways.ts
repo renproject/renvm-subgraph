@@ -20,6 +20,7 @@ import {
     subAmount
 } from "./utils/assetAmount";
 import {
+    getEndUser,
     getIntegrator,
     getIntegratorContract,
     getRenVM,
@@ -219,6 +220,47 @@ export function handleLogMint(event: LogMint): void {
         );
         integratorContract.save();
     }
+
+    {
+        // Update end-user
+        let endUser = getEndUser(event.transaction.from, event.block);
+
+        // TxCount
+        endUser.txCount = addValue(
+            endUser.txCount,
+            endUser.id,
+            "txCount",
+            symbol,
+            one()
+        );
+        endUser.txCountTotal = endUser.txCountTotal.plus(one());
+
+        // Locked
+        endUser.locked = addAmount(
+            endUser.locked,
+            endUser.id,
+            "locked",
+            symbol,
+            tx.amount,
+            true
+        );
+
+        // Volume
+        let volumeBefore = getAmountInUsd(endUser.id, "volume", symbol);
+        endUser.volume = addAmount(
+            endUser.volume,
+            endUser.id,
+            "volume",
+            symbol,
+            tx.amount,
+            false
+        );
+        let volumeAfter = getAmountInUsd(endUser.id, "volume", symbol);
+        // Add difference of volumeAfter and volumeBefore.
+        endUser.volumeTotalUSD = endUser.volumeTotalUSD
+            .plus(volumeAfter)
+            .minus(volumeBefore);
+    }
 }
 
 export function handleLogBurn(event: LogBurn): void {
@@ -327,117 +369,163 @@ export function handleLogBurn(event: LogBurn): void {
         }
     }
 
-    // Integrator
+    {
+        // Integrator
 
-    let integrator: Integrator = getIntegrator(tx.integrator as Bytes, symbol);
+        let integrator: Integrator = getIntegrator(
+            tx.integrator as Bytes,
+            symbol
+        );
 
-    // TxCount
-    integrator.txCount = addValue(
-        integrator.txCount,
-        integrator.id,
-        "txCount",
-        symbol,
-        one()
-    );
-    integrator.txCountTotal = integrator.txCountTotal.plus(one());
+        // TxCount
+        integrator.txCount = addValue(
+            integrator.txCount,
+            integrator.id,
+            "txCount",
+            symbol,
+            one()
+        );
+        integrator.txCountTotal = integrator.txCountTotal.plus(one());
 
-    // Locked
-    integrator.locked = subAmount(
-        integrator.locked,
-        integrator.id,
-        "locked",
-        symbol,
-        tx.amount.minus(
+        // Locked
+        integrator.locked = subAmount(
+            integrator.locked,
+            integrator.id,
+            "locked",
+            symbol,
+            tx.amount.minus(
+                tx.amount
+                    .times(BigInt.fromI32(gateway.burnFee()))
+                    .div(BigInt.fromI32(10000))
+            ),
+            true
+        );
+
+        // Volume
+        let volumeBefore = getAmountInUsd(integrator.id, "volume", symbol);
+        integrator.volume = addAmount(
+            integrator.volume,
+            integrator.id,
+            "volume",
+            symbol,
+            tx.amount,
+            false
+        );
+        let volumeAfter = getAmountInUsd(integrator.id, "volume", symbol);
+        // Add difference of volumeAfter and volumeBefore.
+        integrator.volumeTotalUSD = integrator.volumeTotalUSD
+            .plus(volumeAfter)
+            .minus(volumeBefore);
+
+        // Fees
+        let feesBefore = getAmountInUsd(integrator.id, "fees", symbol);
+        integrator.fees = addAmount(
+            integrator.fees,
+            integrator.id,
+            "fees",
+            symbol,
             tx.amount
                 .times(BigInt.fromI32(gateway.burnFee()))
-                .div(BigInt.fromI32(10000))
-        ),
-        true
-    );
+                .div(BigInt.fromI32(10000)),
+            false
+        );
+        let feesAfter = getAmountInUsd(integrator.id, "fees", symbol);
+        // Add difference of feesAfter and feesBefore.
+        integrator.feesTotalUSD = integrator.feesTotalUSD
+            .plus(feesAfter)
+            .minus(feesBefore);
 
-    // Volume
-    let volumeBefore = getAmountInUsd(integrator.id, "volume", symbol);
-    integrator.volume = addAmount(
-        integrator.volume,
-        integrator.id,
-        "volume",
-        symbol,
-        tx.amount,
-        false
-    );
-    let volumeAfter = getAmountInUsd(integrator.id, "volume", symbol);
-    // Add difference of volumeAfter and volumeBefore.
-    integrator.volumeTotalUSD = integrator.volumeTotalUSD
-        .plus(volumeAfter)
-        .minus(volumeBefore);
+        integrator.save();
 
-    // Fees
-    let feesBefore = getAmountInUsd(integrator.id, "fees", symbol);
-    integrator.fees = addAmount(
-        integrator.fees,
-        integrator.id,
-        "fees",
-        symbol,
-        tx.amount
-            .times(BigInt.fromI32(gateway.burnFee()))
-            .div(BigInt.fromI32(10000)),
-        false
-    );
-    let feesAfter = getAmountInUsd(integrator.id, "fees", symbol);
-    // Add difference of feesAfter and feesBefore.
-    integrator.feesTotalUSD = integrator.feesTotalUSD
-        .plus(feesAfter)
-        .minus(feesBefore);
+        // Integrator contract
 
-    integrator.save();
+        let integratorContract = getIntegratorContract(tx.integrator as Bytes);
 
-    // Integrator contract
+        // TxCount
+        integratorContract.txCount = addValue(
+            integratorContract.txCount,
+            integratorContract.id,
+            "txCount",
+            symbol,
+            one()
+        );
 
-    let integratorContract = getIntegratorContract(tx.integrator as Bytes);
+        // Locked
+        integratorContract.locked = subAmount(
+            integratorContract.locked,
+            integratorContract.id,
+            "locked",
+            symbol,
+            tx.amount.minus(
+                tx.amount
+                    .times(BigInt.fromI32(gateway.burnFee()))
+                    .div(BigInt.fromI32(10000))
+            ),
+            true
+        );
 
-    // TxCount
-    integratorContract.txCount = addValue(
-        integratorContract.txCount,
-        integratorContract.id,
-        "txCount",
-        symbol,
-        one()
-    );
+        // Volume
+        integratorContract.volume = addAmount(
+            integratorContract.volume,
+            integratorContract.id,
+            "volume",
+            symbol,
+            tx.amount,
+            false
+        );
 
-    // Locked
-    integratorContract.locked = subAmount(
-        integratorContract.locked,
-        integratorContract.id,
-        "locked",
-        symbol,
-        tx.amount.minus(
+        // Fees
+        integratorContract.fees = addAmount(
+            integratorContract.fees,
+            integratorContract.id,
+            "fees",
+            symbol,
             tx.amount
                 .times(BigInt.fromI32(gateway.burnFee()))
-                .div(BigInt.fromI32(10000))
-        ),
-        true
-    );
+                .div(BigInt.fromI32(10000)),
+            false
+        );
+        integratorContract.save();
+    }
 
-    // Volume
-    integratorContract.volume = addAmount(
-        integratorContract.volume,
-        integratorContract.id,
-        "volume",
-        symbol,
-        tx.amount,
-        false
-    );
+    {
+        // Update end-user
+        let endUser = getEndUser(event.transaction.from, event.block);
 
-    // Fees
-    integratorContract.fees = addAmount(
-        integratorContract.fees,
-        integratorContract.id,
-        "fees",
-        symbol,
-        tx.amount
-            .times(BigInt.fromI32(gateway.burnFee()))
-            .div(BigInt.fromI32(10000)),
-        false
-    );
-    integratorContract.save();
+        // TxCount
+        endUser.txCount = addValue(
+            endUser.txCount,
+            endUser.id,
+            "txCount",
+            symbol,
+            one()
+        );
+        endUser.txCountTotal = endUser.txCountTotal.plus(one());
+
+        // Locked
+        endUser.locked = addAmount(
+            endUser.locked,
+            endUser.id,
+            "locked",
+            symbol,
+            tx.amount,
+            true
+        );
+
+        // Volume
+        let volumeBefore = getAmountInUsd(endUser.id, "volume", symbol);
+        endUser.volume = addAmount(
+            endUser.volume,
+            endUser.id,
+            "volume",
+            symbol,
+            tx.amount,
+            false
+        );
+        let volumeAfter = getAmountInUsd(endUser.id, "volume", symbol);
+        // Add difference of volumeAfter and volumeBefore.
+        endUser.volumeTotalUSD = endUser.volumeTotalUSD
+            .plus(volumeAfter)
+            .minus(volumeBefore);
+    }
 }

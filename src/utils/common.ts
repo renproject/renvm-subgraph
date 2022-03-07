@@ -11,7 +11,8 @@ import {
     Darknode,
     Integrator,
     IntegratorContract,
-    RenVM
+    RenVM,
+    EndUser
 } from "../../generated/schema";
 import { resolveIntegratorID } from "../integrators";
 
@@ -232,4 +233,29 @@ export const getDarknode = (darknodeID: Bytes): Darknode => {
 
     // tslint:disable-next-line: no-unnecessary-type-assertion
     return darknode as Darknode;
+};
+
+export const getEndUser = (
+    userAddress: Bytes,
+    updateAtBlock: ethereum.Block
+): EndUser => {
+    let endUser: EndUser | null = EndUser.load(userAddress.toHexString());
+    if (endUser == null) {
+        endUser = new EndUser(userAddress.toHexString());
+
+        endUser.firstSeen = updateAtBlock.timestamp;
+        endUser.address = userAddress;
+
+        endUser.txCount = [];
+        endUser.locked = [];
+        endUser.volume = [];
+
+        endUser.txCountTotal = zero();
+        endUser.volumeTotalUSD = zeroDot();
+
+        endUser.save();
+    }
+
+    // tslint:disable-next-line: no-unnecessary-type-assertion
+    return endUser as EndUser;
 };
