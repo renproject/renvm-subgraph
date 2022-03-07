@@ -235,18 +235,8 @@ export function handleLogMint(event: LogMint): void {
         );
         endUser.txCountTotal = endUser.txCountTotal.plus(one());
 
-        // Locked
-        endUser.locked = addAmount(
-            endUser.locked,
-            endUser.id,
-            "locked",
-            symbol,
-            tx.amount,
-            true
-        );
-
         // Volume
-        let volumeBefore = getAmountInUsd(endUser.id, "volume", symbol);
+        let userVolumeBefore = getAmountInUsd(endUser.id, "volume", symbol);
         endUser.volume = addAmount(
             endUser.volume,
             endUser.id,
@@ -255,11 +245,11 @@ export function handleLogMint(event: LogMint): void {
             tx.amount,
             false
         );
-        let volumeAfter = getAmountInUsd(endUser.id, "volume", symbol);
-        // Add difference of volumeAfter and volumeBefore.
+        let userVolumeAfter = getAmountInUsd(endUser.id, "volume", symbol);
+        // Add difference of userVolumeAfter and userVolumeBefore.
         endUser.volumeTotalUSD = endUser.volumeTotalUSD
-            .plus(volumeAfter)
-            .minus(volumeBefore);
+            .plus(userVolumeAfter)
+            .minus(userVolumeBefore);
     }
 }
 
@@ -502,18 +492,8 @@ export function handleLogBurn(event: LogBurn): void {
         );
         endUser.txCountTotal = endUser.txCountTotal.plus(one());
 
-        // Locked
-        endUser.locked = addAmount(
-            endUser.locked,
-            endUser.id,
-            "locked",
-            symbol,
-            tx.amount,
-            true
-        );
-
         // Volume
-        let volumeBefore = getAmountInUsd(endUser.id, "volume", symbol);
+        let userVolumeBefore = getAmountInUsd(endUser.id, "volume", symbol);
         endUser.volume = addAmount(
             endUser.volume,
             endUser.id,
@@ -522,10 +502,10 @@ export function handleLogBurn(event: LogBurn): void {
             tx.amount,
             false
         );
-        let volumeAfter = getAmountInUsd(endUser.id, "volume", symbol);
-        // Add difference of volumeAfter and volumeBefore.
+        let userVolumeAfter = getAmountInUsd(endUser.id, "volume", symbol);
+        // Add difference of userVolumeAfter and userVolumeBefore.
         endUser.volumeTotalUSD = endUser.volumeTotalUSD
-            .plus(volumeAfter)
-            .minus(volumeBefore);
+            .plus(userVolumeAfter)
+            .minus(userVolumeBefore);
     }
 }

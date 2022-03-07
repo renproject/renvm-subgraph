@@ -210,7 +210,7 @@ type IntegratorContract @entity {
 
 type EndUser @entity {
     id: ID!
-    firstSeen: Int!
+    firstSeen: BigInt!
     address: Bytes!
 
     txCount: [ValueWithAsset!]!

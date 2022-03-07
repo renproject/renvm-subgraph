@@ -247,7 +247,6 @@ export const getEndUser = (
         endUser.address = userAddress;
 
         endUser.txCount = [];
-        endUser.locked = [];
         endUser.volume = [];
 
         endUser.txCountTotal = zero();
