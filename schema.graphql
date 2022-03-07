@@ -26,6 +26,7 @@ type Asset @entity {
     priceInUsd: BigDecimal!
 }
 
+
 type ValueWithAsset @entity {
     id: ID!
     symbol: String!
@@ -89,11 +90,17 @@ type Epoch @entity {
     totalRewardShareBCH: BigInt!
 }
 
-# Data accumulated and condensed into day stats
+"""
+The RenVM entity contains all the information about the current state of RenVM's
+on-chain information.
+"""
 type RenVM @entity {
     id: ID! # fixed to '1'
-    # The most recent Ethereum block in which RenVM had activity.
+    """
+    The most recent Ethereum block in which RenVM had activity.
+    """
     activeBlock: BigInt!
+
     activeTimestamp: BigInt!
     previousActiveBlock: BigInt!
     previousActiveTimestamp: BigInt!

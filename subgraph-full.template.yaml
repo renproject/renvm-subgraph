@@ -1,0 +1,229 @@
+specVersion: 0.0.2
+schema:
+    file: ./schema.graphql
+templates:
+    - kind: ethereum/contract
+      name: Gateway
+      network: {{network}}
+      source:
+          abi: Gateway
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.4
+          language: wasm/assemblyscript
+          file: ./src/gateways.ts
+          entities:
+              - Gateway
+          abis:
+              - name: Gateway
+                file: ./abis/Gateway.json
+              - name: RenERC20
+                file: ./abis/RenERC20LogicV1.json
+              - name: UniswapFactory
+                file: ./abis/UniswapFactory.json
+              - name: UniswapExchange
+                file: ./abis/UniswapExchange.json
+              - name: DarknodePayment
+                file: ./abis/DarknodePayment.json
+              - name: DarknodePaymentStore
+                file: ./abis/DarknodePaymentStore.json
+          eventHandlers:
+              - event: LogMint(indexed address,uint256,indexed uint256,indexed bytes32)
+                handler: handleLogMint
+              - event: LogBurn(bytes,uint256,indexed uint256,indexed bytes)
+                handler: handleLogBurn
+dataSources:
+    - kind: ethereum/contract
+      name: GatewayRegistry
+      network: {{network}}
+      source:
+          address: "{{gatewayRegistry}}"
+          abi: GatewayRegistry
+          startBlock: {{startBlock}}
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.4
+          language: wasm/assemblyscript
+          entities:
+              - RenVM
+          abis:
+              - name: GatewayRegistry
+                file: ./abis/GatewayRegistry.json
+              - name: Gateway
+                file: ./abis/Gateway.json
+              - name: RenERC20
+                file: ./abis/RenERC20LogicV1.json
+          eventHandlers:
+              - event: LogGatewayRegistered(string,indexed string,indexed address,indexed address)
+                handler: handleLogGatewayRegistered
+          file: ./src/gatewayRegistry.ts
+    - kind: ethereum/contract
+      name: GatewayRegistryVDot3
+      network: {{network}}
+      source:
+          address: "{{gatewayRegistryVDot3}}"
+          abi: GatewayRegistry
+          startBlock: {{startBlock}}
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.4
+          language: wasm/assemblyscript
+          entities:
+              - RenVM
+          abis:
+              - name: GatewayRegistry
+                file: ./abis/GatewayRegistry.json
+              - name: Gateway
+                file: ./abis/Gateway.json
+              - name: RenERC20
+                file: ./abis/RenERC20LogicV1.json
+          eventHandlers:
+              - event: LogGatewayRegistered(string,indexed string,indexed address,indexed address)
+                handler: handleLogGatewayRegistered
+          file: ./src/gatewayRegistry.ts
+    - kind: ethereum/contract
+      name: BTCGateway
+      network: {{network}}
+      source:
+          address: "{{btcGateway}}"
+          abi: Gateway
+          startBlock: {{startBlock}}
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.4
+          language: wasm/assemblyscript
+          entities:
+              - LogMint
+              - LogBurn
+              - Integrator
+              - RenVM
+          abis:
+              - name: Gateway
+                file: ./abis/Gateway.json
+          callHandlers:
+              - function: mint(bytes32,uint256,bytes32,bytes)
+                handler: handleMint
+              - function: burn(bytes,uint256)
+                handler: handleBurn
+          file: ./src/btcGateway.ts
+    - kind: ethereum/contract
+      name: ZECGateway
+      network: {{network}}
+      source:
+          address: "{{zecGateway}}"
+          abi: Gateway
+          startBlock: {{startBlock}}
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.4
+          language: wasm/assemblyscript
+          entities:
+              - LogMint
+              - LogBurn
+              - Integrator
+              - RenVM
+          abis:
+              - name: Gateway
+                file: ./abis/Gateway.json
+          callHandlers:
+              - function: mint(bytes32,uint256,bytes32,bytes)
+                handler: handleMint
+              - function: burn(bytes,uint256)
+                handler: handleBurn
+          file: ./src/zecGateway.ts
+    - kind: ethereum/contract
+      name: BCHGateway
+      network: {{network}}
+      source:
+          address: "{{bchGateway}}"
+          abi: Gateway
+          startBlock: {{startBlock}}
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.4
+          language: wasm/assemblyscript
+          entities:
+              - LogMint
+              - LogBurn
+              - Integrator
+              - RenVM
+          abis:
+              - name: Gateway
+                file: ./abis/Gateway.json
+          callHandlers:
+              - function: mint(bytes32,uint256,bytes32,bytes)
+                handler: handleMint
+              - function: burn(bytes,uint256)
+                handler: handleBurn
+          file: ./src/bchGateway.ts
+    - kind: ethereum/contract
+      name: DarknodeRegistry
+      network: {{network}}
+      source:
+          address: "{{darknodeRegistry}}"
+          abi: DarknodeRegistry
+          startBlock: {{startBlock}}
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.4
+          language: wasm/assemblyscript
+          entities:
+              - LogDarknodeRegistered
+              - LogDarknodeDeregistered
+              - LogNewEpoch
+          abis:
+              - name: DarknodeRegistry
+                file: ./abis/DarknodeRegistry.json
+              - name: DarknodePayment
+                file: ./abis/DarknodePayment.json
+              - name: Gateway
+                file: ./abis/Gateway.json
+              - name: RenERC20
+                file: ./abis/RenERC20LogicV1.json
+              - name: UniswapFactory
+                file: ./abis/UniswapFactory.json
+              - name: UniswapExchange
+                file: ./abis/UniswapExchange.json
+          eventHandlers:
+              - event: LogDarknodeRegistered(indexed address,indexed address,uint256)
+                handler: handleLogDarknodeRegistered
+              - event: LogDarknodeDeregistered(indexed address,indexed address)
+                handler: handleLogDarknodeDeregistered
+              - event: LogDarknodeRefunded(indexed address,indexed address,uint256)
+                handler: handleLogDarknodeRefunded
+              - event: LogNewEpoch(indexed uint256)
+                handler: handleLogNewEpoch
+          file: ./src/darknodeRegistry.ts
+    - kind: ethereum/contract
+      name: DarknodePayment
+      network: {{network}}
+      source:
+          address: "{{darknodePayment}}"
+          abi: DarknodePayment
+          startBlock: {{startBlock}}
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.4
+          language: wasm/assemblyscript
+          entities:
+              - LogDarknodeWithdrew
+          abis:
+              - name: DarknodePayment
+                file: ./abis/DarknodePayment.json
+              - name: Gateway
+                file: ./abis/Gateway.json
+              - name: RenERC20
+                file: ./abis/RenERC20LogicV1.json
+              - name: UniswapFactory
+                file: ./abis/UniswapFactory.json
+              - name: UniswapExchange
+                file: ./abis/UniswapExchange.json
+          callHandlers:
+              - function: changeCycle()
+                handler: handleChangeCycle
+          eventHandlers:
+              - event: LogDarknodeClaim(indexed address,uint256)
+                handler: handleLogDarknodeClaim
+              - event: LogDarknodeWithdrew(indexed address,indexed address,indexed address,uint256)
+                handler: handleLogDarknodeWithdrew
+          file: ./src/darknodePayment.ts
