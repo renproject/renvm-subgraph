@@ -250,6 +250,8 @@ export function handleLogMint(event: LogMint): void {
         endUser.volumeTotalUSD = endUser.volumeTotalUSD
             .plus(userVolumeAfter)
             .minus(userVolumeBefore);
+
+        endUser.save();
     }
 }
 
@@ -507,5 +509,7 @@ export function handleLogBurn(event: LogBurn): void {
         endUser.volumeTotalUSD = endUser.volumeTotalUSD
             .plus(userVolumeAfter)
             .minus(userVolumeBefore);
+
+        endUser.save();
     }
 }

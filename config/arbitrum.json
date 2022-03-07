@@ -1,5 +1,5 @@
 {
-    "network": "arbitrum",
+    "network": "arbitrum-one",
     "startBlock": 205834,
 
     "darknodeRegistry": "0x0000000000000000000000000000000000000000",
