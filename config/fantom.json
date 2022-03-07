@@ -1,15 +1,15 @@
 {
-    "network": "bsc",
-    "startBlock": 1929336,
+    "network": "fantom",
+    "startBlock": 7496306,
 
     "darknodeRegistry": "0x0000000000000000000000000000000000000000",
     "darknodePayment": "0x0000000000000000000000000000000000000000",
 
     "gatewayRegistry": "0x21C482f153D0317fe85C60bE1F7fa079019fcEbD",
     "gatewayRegistryVDot3": "0x0000000000000000000000000000000000000000",
-    "uniswapFactory": "0xbcfccbde45ce874adcb698cc183debcf17952812",
-    "weth": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
-    "usd": "0xe9e7cea3dedca5984780bafc599bd69add087d56",
+    "uniswapFactory": "0x0000000000000000000000000000000000000000",
+    "weth": "0x0000000000000000000000000000000000000000",
+    "usd": "0x0000000000000000000000000000000000000000",
 
     "_comment": "// DEPRECATED //",
     "btcGateway": "0x0000000000000000000000000000000000000000",
