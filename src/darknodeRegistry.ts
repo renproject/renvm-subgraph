@@ -36,9 +36,11 @@ export function handleLogDarknodeRegistered(
 
     darknode.bond = event.params._bond;
 
-    darknode.registeredAt = epoch.timestamp.plus(
-        registry.minimumEpochInterval()
-    );
+    if(epoch) {
+        darknode.registeredAt = epoch.timestamp.plus(
+            registry.minimumEpochInterval()
+        );
+    }
     darknode.deregisteredAt = zero();
 
     darknode.publicKey = registry.getDarknodePublicKey(darknodeID);
@@ -58,9 +60,11 @@ export function handleLogDarknodeDeregistered(
     let darknode = getDarknode(event.params._darknodeID);
     if (darknode !== null) {
         darknode.operator = event.params._darknodeOperator;
-        darknode.deregisteredAt = epoch.timestamp.plus(
-            registry.minimumEpochInterval()
-        );
+        if(epoch) {
+            darknode.deregisteredAt = epoch.timestamp.plus(
+                registry.minimumEpochInterval()
+            );
+        }
 
         darknode.save();
     }

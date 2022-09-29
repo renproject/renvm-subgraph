@@ -50,7 +50,7 @@ export function handleLogMint(event: LogMint): void {
     tx.transactionTo = event.transaction.to;
     // tx.integrator = call.from;
     tx.integrator = event.params._to;
-    if (tx.transactionTo.equals(gateway._address)) {
+    if (tx.transactionTo === gateway._address) {
         tx.integrator = Bytes.fromUTF8("direct") as Bytes;
     }
     tx.save();
@@ -282,7 +282,7 @@ export function handleLogBurn(event: LogBurn): void {
     // tx.integrator = call.from;
     tx.integrator = event.transaction.from;
     tx.transactionTo = event.transaction.to;
-    if (tx.transactionTo.equals(gateway._address)) {
+    if (tx.transactionTo === gateway._address) {
         tx.integrator = Bytes.fromUTF8("direct") as Bytes;
     }
     // tx.burnRecipient = call.inputs._to;

@@ -1,6 +1,6 @@
 // tslint:disable: only-arrow-functions prefer-for-of
 
-import { BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ByteArray, Bytes } from "@graphprotocol/graph-ts";
 
 import { Gateway } from "../generated/BTCGateway/Gateway";
 import { Integrator, Transaction } from "../generated/schema";
@@ -37,7 +37,7 @@ export function handleMint(call: MintCall): void {
     renVM.save();
 
     // Check that the mint hasn't been submitted directly by an account
-    if (!call.transaction.to.equals(gateway._address)) {
+    if (call.transaction.to !== gateway._address) {
         if (tx.integrator !== null) {
             let integrator: Integrator = getIntegrator(tx.integrator as Bytes);
             integrator.txCountBTC = integrator.txCountBTC.plus(one());
@@ -93,8 +93,8 @@ export function handleBurn(call: BurnCall): void {
     renVM.btcBurnFee = gateway.burnFee();
     renVM.save();
 
-    // Check that the burn hasn't been submitted directly by an account
-    if (!call.transaction.to.equals(gateway._address)) {
+    // Check that the burn hasn't been submitted directly by an accoun
+    if (call.transaction.to !== gateway._address) {
         let integrator: Integrator = getIntegrator(tx.integrator as Bytes);
         integrator.txCountBTC = integrator.txCountBTC.plus(one());
         integrator.volumeBTC = integrator.volumeBTC.plus(tx.amount);

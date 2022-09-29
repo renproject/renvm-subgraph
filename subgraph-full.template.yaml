@@ -9,7 +9,7 @@ templates:
           abi: Gateway
       mapping:
           kind: ethereum/events
-          apiVersion: 0.0.4
+          apiVersion: 0.0.6
           language: wasm/assemblyscript
           file: ./src/gateways.ts
           entities:
@@ -42,7 +42,7 @@ dataSources:
           startBlock: {{startBlock}}
       mapping:
           kind: ethereum/events
-          apiVersion: 0.0.4
+          apiVersion: 0.0.6
           language: wasm/assemblyscript
           entities:
               - RenVM
@@ -66,7 +66,7 @@ dataSources:
           startBlock: {{startBlock}}
       mapping:
           kind: ethereum/events
-          apiVersion: 0.0.4
+          apiVersion: 0.0.6
           language: wasm/assemblyscript
           entities:
               - RenVM
@@ -90,7 +90,7 @@ dataSources:
           startBlock: {{startBlock}}
       mapping:
           kind: ethereum/events
-          apiVersion: 0.0.4
+          apiVersion: 0.0.6
           language: wasm/assemblyscript
           entities:
               - LogMint
@@ -115,7 +115,7 @@ dataSources:
           startBlock: {{startBlock}}
       mapping:
           kind: ethereum/events
-          apiVersion: 0.0.4
+          apiVersion: 0.0.6
           language: wasm/assemblyscript
           entities:
               - LogMint
@@ -140,7 +140,7 @@ dataSources:
           startBlock: {{startBlock}}
       mapping:
           kind: ethereum/events
-          apiVersion: 0.0.4
+          apiVersion: 0.0.6
           language: wasm/assemblyscript
           entities:
               - LogMint
@@ -165,7 +165,7 @@ dataSources:
           startBlock: {{startBlock}}
       mapping:
           kind: ethereum/events
-          apiVersion: 0.0.4
+          apiVersion: 0.0.6
           language: wasm/assemblyscript
           entities:
               - LogDarknodeRegistered
@@ -203,7 +203,7 @@ dataSources:
           startBlock: {{startBlock}}
       mapping:
           kind: ethereum/events
-          apiVersion: 0.0.4
+          apiVersion: 0.0.6
           language: wasm/assemblyscript
           entities:
               - LogDarknodeWithdrew
