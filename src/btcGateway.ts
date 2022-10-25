@@ -1,6 +1,6 @@
 // tslint:disable: only-arrow-functions prefer-for-of
 
-import { Address, BigInt, ByteArray, Bytes } from "@graphprotocol/graph-ts";
+import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 import { Gateway } from "../generated/BTCGateway/Gateway";
 import { Integrator, Transaction } from "../generated/schema";
