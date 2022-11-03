@@ -35,7 +35,7 @@ export function handleMint(call: MintCall): void {
     renVM.bchBurnFee = gateway.burnFee();
     renVM.save();
 
-    if (!call.transaction.to.equals(gateway._address)) {
+    if (call.transaction.to !== gateway._address) {
         if (tx.integrator !== null) {
             let integrator: Integrator = getIntegrator(tx.integrator as Bytes);
             integrator.txCountBCH = integrator.txCountBCH.plus(one());
@@ -92,7 +92,7 @@ export function handleBurn(call: BurnCall): void {
     renVM.save();
 
     // Check that the burn hasn't been submitted directly by an account
-    if (!call.transaction.to.equals(gateway._address)) {
+    if (call.transaction.to !== gateway._address) {
         let integrator: Integrator = getIntegrator(tx.integrator as Bytes);
         integrator.txCountBCH = integrator.txCountBCH.plus(one());
         integrator.volumeBCH = integrator.volumeBCH.plus(tx.amount);

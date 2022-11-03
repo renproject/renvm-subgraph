@@ -75,10 +75,10 @@ yarn deploy:local
 
 ## Deploying to thegraph.com
 
-Authorize, using the AUTH_CODE found in your thegraph.com account:
+Authorize, using the DEPLOY_KEY found in your thegraph.com account:
 
 ```sh
-graph auth https://api.thegraph.com/deploy/ <AUTH_CODE>
+graph auth --studio <DEPLOY_KEY>
 ```
 
 Then run one of:
